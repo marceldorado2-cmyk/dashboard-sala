@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Dashboard Controle de Sala de Atendimento - Janeiro a Junho 2026">
+<title>Dashboard | Controle de Sala 2026</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; color: #1a1a2e; font-size: 14px; }
+
+  .header {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%);
+    color: white; padding: 28px 36px; border-bottom: 3px solid #e94560;
+  }
+  .header h1 { font-size: 22px; font-weight: 700; letter-spacing: 0.5px; }
+  .header p { font-size: 12px; color: #a0aec0; margin-top: 6px; }
+  .header .badge {
+    display: inline-block; background: #e94560; color: white;
+    font-size: 10px; font-weight: 700; padding: 3px 10px;
+    border-radius: 20px; margin-top: 8px; letter-spacing: 1px;
+  }
+
+  .container { max-width: 1200px; margin: 0 auto; padding: 24px 20px; }
+
+  .section-title {
+    font-size: 11px; font-weight: 700; letter-spacing: 2px;
+    color: #718096; text-transform: uppercase;
+    border-left: 3px solid #e94560; padding-left: 10px;
+    margin: 28px 0 14px;
+  }
+
+  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; }
+  .kpi-card {
+    background: white; border-radius: 10px; padding: 18px 16px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.07); border-top: 3px solid #e94560;
+  }
+  .kpi-card.green { border-top-color: #38a169; }
+  .kpi-card.blue { border-top-color: #3182ce; }
+  .kpi-card.orange { border-top-color: #dd6b20; }
+  .kpi-card.purple { border-top-color: #805ad5; }
+  .kpi-card.gray { border-top-color: #718096; }
+
+  .kpi-label { font-size: 10px; color: #718096; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; }
+  .kpi-value { font-size: 28px; font-weight: 800; color: #1a1a2e; margin: 6px 0 2px; }
+  .kpi-sub { font-size: 11px; color: #718096; }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+  .card {
+    background: white; border-radius: 10px; padding: 20px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+  }
+  .card h3 { font-size: 12px; font-weight: 700; color: #4a5568; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 14px; }
+
+  table { width: 100%; border-collapse: collapse; }
+  th { background: #f7fafc; font-size: 10px; font-weight: 700; color: #718096;
+       text-transform: uppercase; padding: 8px 10px; text-align: left; border-bottom: 2px solid #e2e8f0; }
+  td { padding: 8px 10px; border-bottom: 1px solid #f0f2f5; font-size: 12px; color: #2d3748; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #f7fafc; }
+
+  .bar-wrap { background: #edf2f7; border-radius: 4px; height: 10px; width: 100%; margin-top: 4px; }
+  .bar-fill { height: 10px; border-radius: 4px; background: #3182ce; }
+  .bar-fill.red { background: #e94560; }
+  .bar-fill.green { background: #38a169; }
+  .bar-fill.orange { background: #dd6b20; }
+
+  .tag {
+    display: inline-block; padding: 2px 8px; border-radius: 20px;
+    font-size: 10px; font-weight: 700;
+  }
+  .tag.q { background: #c6f6d5; color: #276749; }
+  .tag.nq { background: #fed7d7; color: #9b2335; }
+  .tag.warn { background: #feebc8; color: #7b341e; }
+  .tag.info { background: #bee3f8; color: #2a69ac; }
+
+  .insight-list { list-style: none; }
+  .insight-list li {
+    padding: 10px 12px; border-radius: 6px; margin-bottom: 8px;
+    font-size: 12px; line-height: 1.6;
+    border-left: 4px solid #ccc;
+  }
+  .insight-list li.red { background: #fff5f5; border-color: #e94560; }
+  .insight-list li.green { background: #f0fff4; border-color: #38a169; }
+  .insight-list li.orange { background: #fffaf0; border-color: #dd6b20; }
+  .insight-list li.blue { background: #ebf8ff; border-color: #3182ce; }
+  .insight-list li.purple { background: #faf5ff; border-color: #805ad5; }
+
+  .audit-box {
+    background: #f7fafc; border: 1px solid #e2e8f0; border-radius: 8px;
+    padding: 16px; font-size: 11px; color: #4a5568; line-height: 1.8;
+  }
+  .audit-box strong { color: #1a1a2e; }
+
+  .divider { border: none; border-top: 1px solid #e2e8f0; margin: 8px 0; }
+
+  .two-col-insight { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+  .q-bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .q-bar-label { font-size: 11px; color: #4a5568; width: 90px; flex-shrink: 0; }
+  .q-bar-wrap { flex: 1; background: #edf2f7; border-radius: 4px; height: 10px; }
+  .q-bar-fill { height: 10px; border-radius: 4px; }
+  .q-bar-val { font-size: 11px; font-weight: 700; color: #2d3748; width: 55px; text-align: right; }
+
+  .footer {
+    text-align: center; margin-top: 30px; padding: 16px;
+    color: #a0aec0; font-size: 10px; border-top: 1px solid #e2e8f0;
+  }
+
+  @media(max-width: 700px) {
+    .grid-2, .two-col-insight { grid-template-columns: 1fr; }
+    .kpi-value { font-size: 22px; }
+    .header h1 { font-size: 17px; }
+    .header { padding: 18px 16px; }
+    .container { padding: 16px 10px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>📊 Dashboard — Controle de Sala de Atendimento</h1>
+  <p>Período analisado: <strong>01/01/2026 a 09/06/2026</strong> &nbsp;|&nbsp; Tipo de atendimento: <strong>NoTour (100%)</strong></p>
+  <span class="badge">VISÃO EXECUTIVA</span>
+</div>
+
+<div class="container">
+
+  <!-- AUDITORIA -->
+  <div class="section-title">🔍 Auditoria da Base</div>
+  <div class="audit-box">
+    <strong>Registros brutos recebidos:</strong> 120 &nbsp;|&nbsp;
+    <strong>Duplicatas removidas:</strong> 0 &nbsp;|&nbsp;
+    <strong>Base válida para análise:</strong> 120 registros<br>
+    <strong>Critério de deduplicação:</strong> Verificação por Nome 1 + Data de atendimento — nenhuma duplicata detectada.<br>
+    <strong>Observação:</strong> Todos os registros possuem Status = <em>NoTour</em> e Valor vendido = R$ 0,00.
+    A base reflete exclusivamente visitantes que não realizaram o tour/apresentação de vendas.
+  </div>
+
+  <!-- KPIs -->
+  <div class="section-title">📌 Principais KPIs</div>
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-label">Total Atendimentos</div>
+      <div class="kpi-value">120</div>
+      <div class="kpi-sub">NoTour — Jan a Jun/26</div>
+    </div>
+    <div class="kpi-card green">
+      <div class="kpi-label">Qualificados (Q)</div>
+      <div class="kpi-value">79</div>
+      <div class="kpi-sub">65,8% do total</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Não Qualificados (NQ)</div>
+      <div class="kpi-value">41</div>
+      <div class="kpi-sub">34,2% do total</div>
+    </div>
+    <div class="kpi-card blue">
+      <div class="kpi-label">Estados Representados</div>
+      <div class="kpi-value">18</div>
+      <div class="kpi-sub">Alcance nacional</div>
+    </div>
+    <div class="kpi-card orange">
+      <div class="kpi-label">Promotores Ativos</div>
+      <div class="kpi-value">28</div>
+      <div class="kpi-sub">Promotores únicos</div>
+    </div>
+    <div class="kpi-card purple">
+      <div class="kpi-label">Liners Ativos</div>
+      <div class="kpi-value">22</div>
+      <div class="kpi-sub">Liners únicos</div>
+    </div>
+    <div class="kpi-card gray">
+      <div class="kpi-label">Com Brindes</div>
+      <div class="kpi-value">12</div>
+      <div class="kpi-sub">10% dos atendimentos</div>
+    </div>
+    <div class="kpi-card" style="border-top-color:#0f3460">
+      <div class="kpi-label">Conversão de Vendas</div>
+      <div class="kpi-value">0%</div>
+      <div class="kpi-sub">R$ 0,00 — base NoTour</div>
+    </div>
+  </div>
+
+  <!-- QUALIFICAÇÃO -->
+  <div class="section-title">✅ Perfil de Qualificação</div>
+  <div class="card">
+    <h3>Distribuição Q × NQ</h3>
+    <div class="q-bar-row">
+      <div class="q-bar-label">Qualificados (Q)</div>
+      <div class="q-bar-wrap">
+        <div class="q-bar-fill" style="width:65.8%;background:#38a169;"></div>
+      </div>
+      <div class="q-bar-val">79 — 65,8%</div>
+    </div>
+    <div class="q-bar-row">
+      <div class="q-bar-label">Não Qualif. (NQ)</div>
+      <div class="q-bar-wrap">
+        <div class="q-bar-fill" style="width:34.2%;background:#e94560;"></div>
+      </div>
+      <div class="q-bar-val">41 — 34,2%</div>
+    </div>
+    <hr class="divider" style="margin:12px 0">
+    <p style="font-size:11px;color:#718096;line-height:1.7">
+      <strong>Interpretação:</strong> Mais de 1 em cada 3 visitantes não atende aos critérios de qualificação.
+      Em uma operação de tour, esse índice impacta diretamente a taxa de conversão futura e a eficiência do time de vendas.
+    </p>
+  </div>
+
+  <!-- EVOLUÇÃO MENSAL -->
+  <div class="section-title">📅 Volume por Mês</div>
+  <div class="card">
+    <h3>NoTour por mês</h3>
+    <table>
+      <thead>
+        <tr><th>Mês</th><th>Atendimentos</th><th>Q</th><th>NQ</th><th>% NQ</th><th>Volume</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Janeiro/26</td><td><strong>38</strong></td><td>25</td><td>13</td>
+          <td><span class="tag warn">34,2%</span></td>
+          <td><div class="bar-wrap"><div class="bar-fill" style="width:100%"></div></div></td></tr>
+        <tr><td>Fevereiro/26</td><td><strong>13</strong></td><td>8</td><td>5</td>
+          <td><span class="tag warn">38,5%</span></td>
+          <td><div class="bar-wrap"><div class="bar-fill" style="width:34%"></div></div></td></tr>
+        <tr><td>Março/26</td><td><strong>14</strong></td><td>11</td><td>3</td>
+          <td><span class="tag q">21,4%</span></td>
+          <td><div class="bar-wrap"><div class="bar-fill green" style="width:37%"></div></div></td></tr>
+        <tr><td>Abril/26</td><td><strong>27</strong></td><td>18</td><td>9</td>
+          <td><span class="tag warn">33,3%</span></td>
+          <td><div class="bar-wrap"><div class="bar-fill orange" style="width:71%"></div></div></td></tr>
+        <tr><td>Maio/26</td><td><strong>23</strong></td><td>14</td><td>9</td>
+          <td><span class="tag warn">39,1%</span></td>
+          <td><div class="bar-wrap"><div class="bar-fill orange" style="width:61%"></div></div></td></tr>
+        <tr><td>Junho/26 *</td><td><strong>5</strong></td><td>3</td><td>2</td>
+          <td><span class="tag warn">40,0%</span></td>
+          <td><div class="bar-wrap"><div class="bar-fill red" style="width:13%"></div></div></td></tr>
+      </tbody>
+    </table>
+    <p style="font-size:10px;color:#a0aec0;margin-top:8px">* Junho/26 parcial — dados até dia 09.</p>
+  </div>
+
+  <!-- LOCAIS DE CAPTAÇÃO -->
+  <div class="section-title">📍 Locais de Captação</div>
+  <div class="card">
+    <h3>Volume e qualificação por ponto</h3>
+    <table>
+      <thead>
+        <tr><th>Local</th><th>Total</th><th>Q</th><th>NQ</th><th>% Q</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Parque Dreams</td><td><strong>38</strong></td><td>24</td><td>14</td><td><span class="tag warn">63,2%</span></td></tr>
+        <tr><td>Frente da Sala Dream</td><td><strong>31</strong></td><td>19</td><td>12</td><td><span class="tag warn">61,3%</span></td></tr>
+        <tr><td>Baden Baden</td><td><strong>21</strong></td><td>13</td><td>8</td><td><span class="tag warn">61,9%</span></td></tr>
+        <tr><td>Esquina 1</td><td><strong>7</strong></td><td>5</td><td>2</td><td><span class="tag q">71,4%</span></td></tr>
+        <tr><td>Agendamento</td><td><strong>4</strong></td><td>4</td><td>0</td><td><span class="tag q">100%</span></td></tr>
+        <tr><td>Dream House</td><td><strong>2</strong></td><td>2</td><td>0</td><td><span class="tag q">100%</span></td></tr>
+        <tr><td>Praça</td><td><strong>2</strong></td><td>2</td><td>0</td><td><span class="tag q">100%</span></td></tr>
+        <tr><td>Outros / Não informado</td><td><strong>15</strong></td><td>10</td><td>5</td><td><span class="tag warn">66,7%</span></td></tr>
+      </tbody>
+    </table>
+    <p style="font-size:11px;color:#718096;margin-top:10px;line-height:1.6">
+      <strong>Destaque:</strong> Agendamento, Dream House e Praça = 100% de qualificação.
+      Parque Dreams e Frente da Sala, apesar do maior volume, têm as menores taxas de Q.
+    </p>
+  </div>
+
+  <!-- PROMOTORES E LINERS -->
+  <div class="grid-2">
+    <div class="card">
+      <h3>🎯 Top Promotores (volume)</h3>
+      <table>
+        <thead><tr><th>Promotor</th><th>Total</th><th>% Q</th></tr></thead>
+        <tbody>
+          <tr><td>Raphael Bueno</td><td>18</td><td><span class="tag warn">61,1%</span></td></tr>
+          <tr><td>Francisco A. Rodrigues</td><td>16</td><td><span class="tag q">75,0%</span></td></tr>
+          <tr><td>Josyene Freitas</td><td>10</td><td><span class="tag q">80,0%</span></td></tr>
+          <tr><td>Matheus Esley Silva</td><td>10</td><td><span class="tag nq">50,0%</span></td></tr>
+          <tr><td>Larissa Ribeiro</td><td>7</td><td><span class="tag warn">57,1%</span></td></tr>
+          <tr><td>Suene Cintia</td><td>5</td><td><span class="tag q">80,0%</span></td></tr>
+          <tr><td>Pedro H. Gomes</td><td>5</td><td><span class="tag warn">60,0%</span></td></tr>
+          <tr><td>Luan S. Firmino</td><td>4</td><td><span class="tag q">75,0%</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card">
+      <h3>🎙️ Top Liners (volume)</h3>
+      <table>
+        <thead><tr><th>Liner</th><th>Total</th><th>% Q</th></tr></thead>
+        <tbody>
+          <tr><td>Renata Dorado</td><td>28</td><td><span class="tag q">71,4%</span></td></tr>
+          <tr><td>Bianca Duarte</td><td>11</td><td><span class="tag warn">54,5%</span></td></tr>
+          <tr><td>Karina F. Nascimento</td><td>8</td><td><span class="tag warn">62,5%</span></td></tr>
+          <tr><td>Amanda Dorado</td><td>8</td><td><span class="tag warn">62,5%</span></td></tr>
+          <tr><td>Ramon S. Pinheiro</td><td>7</td><td><span class="tag q">85,7%</span></td></tr>
+          <tr><td>Guilherme S. Batista</td><td>7</td><td><span class="tag warn">57,1%</span></td></tr>
+          <tr><td>Silvia Regina</td><td>7</td><td><span class="tag q">71,4%</span></td></tr>
+          <tr><td>Stella Christy Dias</td><td>6</td><td><span class="tag nq">50,0%</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- GEOGRAFIA -->
+  <div class="section-title">🗺️ Distribuição Geográfica</div>
+  <div class="grid-2">
+    <div class="card">
+      <h3>Top Estados</h3>
+      <table>
+        <thead><tr><th>UF</th><th>Visitantes</th><th>% Q</th></tr></thead>
+        <tbody>
+          <tr><td><strong>SP</strong></td><td>67</td><td><span class="tag q">67,2%</span></td></tr>
+          <tr><td><strong>MG</strong></td><td>14</td><td><span class="tag warn">57,1%</span></td></tr>
+          <tr><td><strong>RJ</strong></td><td>10</td><td><span class="tag warn">60,0%</span></td></tr>
+          <tr><td><strong>PR</strong></td><td>3</td><td><span class="tag q">66,7%</span></td></tr>
+          <tr><td><strong>PE</strong></td><td>3</td><td><span class="tag warn">66,7%</span></td></tr>
+          <tr><td><strong>BA</strong></td><td>3</td><td><span class="tag warn">66,7%</span></td></tr>
+          <tr><td><strong>MT</strong></td><td>3</td><td><span class="tag q">66,7%</span></td></tr>
+          <tr><td><strong>PA</strong></td><td>2</td><td><span class="tag nq">0%</span></td></tr>
+          <tr><td><strong>CE</strong></td><td>2</td><td><span class="tag q">100%</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card">
+      <h3>Concentração Regional</h3>
+      <div class="q-bar-row">
+        <div class="q-bar-label">SP</div>
+        <div class="q-bar-wrap"><div class="q-bar-fill" style="width:55.8%;background:#3182ce;"></div></div>
+        <div class="q-bar-val">55,8% (67)</div>
+      </div>
+      <div class="q-bar-row">
+        <div class="q-bar-label">MG</div>
+        <div class="q-bar-wrap"><div class="q-bar-fill" style="width:11.7%;background:#4299e1;"></div></div>
+        <div class="q-bar-val">11,7% (14)</div>
+      </div>
+      <div class="q-bar-row">
+        <div class="q-bar-label">RJ</div>
+        <div class="q-bar-wrap"><div class="q-bar-fill" style="width:8.3%;background:#63b3ed;"></div></div>
+        <div class="q-bar-val">8,3% (10)</div>
+      </div>
+      <div class="q-bar-row">
+        <div class="q-bar-label">Demais UFs</div>
+        <div class="q-bar-wrap"><div class="q-bar-fill" style="width:24.2%;background:#bee3f8;"></div></div>
+        <div class="q-bar-val">24,2% (29)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RENDA -->
+  <div class="section-title">💰 Perfil de Renda Declarada</div>
+  <div class="card">
+    <h3>Qualificação por faixa de renda</h3>
+    <table>
+      <thead><tr><th>Faixa de Renda</th><th>Visitantes</th><th>Q</th><th>NQ</th><th>% Q</th></tr></thead>
+      <tbody>
+        <tr><td>Até R$ 12.000</td><td>22</td><td>9</td><td>13</td><td><span class="tag nq">40,9%</span></td></tr>
+        <tr><td>R$ 13.000 – R$ 15.000</td><td>46</td><td>27</td><td>19</td><td><span class="tag warn">58,7%</span></td></tr>
+        <tr><td>R$ 18.000 – R$ 25.000</td><td>18</td><td>13</td><td>5</td><td><span class="tag q">72,2%</span></td></tr>
+        <tr><td>R$ 30.000 – R$ 50.000</td><td>25</td><td>21</td><td>4</td><td><span class="tag q">84,0%</span></td></tr>
+        <tr><td>R$ 100.000+</td><td>2</td><td>2</td><td>0</td><td><span class="tag q">100%</span></td></tr>
+      </tbody>
+    </table>
+    <p style="font-size:11px;color:#718096;margin-top:10px;line-height:1.6">
+      Taxa de qualificação cresce progressivamente com a renda. Faixas abaixo de R$12k têm 59,1% de NQ —
+      maior desalinhamento entre perfil captado e perfil do produto.
+    </p>
+  </div>
+
+  <!-- INSIGHTS -->
+  <div class="section-title">🔬 Leituras Estratégicas</div>
+  <ul class="insight-list">
+    <li class="red"><strong>🚨 100% NoTour, R$ 0,00 de receita.</strong> Esta base registra apenas quem não realizou o tour. O destino dessas 120 pessoas no funil precisa ser rastreado.</li>
+    <li class="orange"><strong>⚠️ 34,2% NQ.</strong> ~1 em cada 3 visitantes está fora do perfil. Custo operacional sem retorno potencial direto.</li>
+    <li class="blue"><strong>📊
