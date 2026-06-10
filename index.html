@@ -3,372 +3,976 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Dashboard Controle de Sala de Atendimento - Janeiro a Junho 2026">
 <title>Dashboard | Controle de Sala 2026</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&display=swap');
+
+  :root {
+    --red: #e94560;
+    --red-dark: #c0392b;
+    --red-glow: rgba(233,69,96,0.4);
+    --bg: #050508;
+    --bg2: #0a0a10;
+    --bg3: #0f0f18;
+    --card: #0d0d16;
+    --card2: #12121e;
+    --border: rgba(233,69,96,0.25);
+    --border-bright: rgba(233,69,96,0.7);
+    --text: #e8e8f0;
+    --text-dim: #7a7a9a;
+    --text-bright: #ffffff;
+    --green: #00ff88;
+    --green-dim: rgba(0,255,136,0.15);
+    --blue: #00b4ff;
+    --orange: #ff8c00;
+    --purple: #b060ff;
+  }
+
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; color: #1a1a2e; font-size: 14px; }
 
+  body {
+    font-family: 'Rajdhani', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse at 20% 0%, rgba(233,69,96,0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 100%, rgba(233,69,96,0.05) 0%, transparent 50%);
+  }
+
+  /* SCANLINES EFFECT */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.03) 2px,
+      rgba(0,0,0,0.03) 4px
+    );
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* HEADER */
   .header {
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%);
-    color: white; padding: 28px 36px; border-bottom: 3px solid #e94560;
+    background: linear-gradient(180deg, #0a0a12 0%, #080810 100%);
+    border-bottom: 1px solid var(--border-bright);
+    padding: 24px 36px;
+    position: relative;
+    overflow: hidden;
   }
-  .header h1 { font-size: 22px; font-weight: 700; letter-spacing: 0.5px; }
-  .header p { font-size: 12px; color: #a0aec0; margin-top: 6px; }
-  .header .badge {
-    display: inline-block; background: #e94560; color: white;
-    font-size: 10px; font-weight: 700; padding: 3px 10px;
-    border-radius: 20px; margin-top: 8px; letter-spacing: 1px;
+  .header::before {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--red), transparent);
+    box-shadow: 0 0 20px var(--red-glow);
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -10%;
+    width: 120%;
+    height: 200%;
+    background: radial-gradient(ellipse, rgba(233,69,96,0.04) 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .header h1 {
+    font-family: 'Orbitron', monospace;
+    font-size: 20px;
+    font-weight: 900;
+    color: var(--text-bright);
+    letter-spacing: 2px;
+    text-shadow: 0 0 20px var(--red-glow);
+  }
+  .header h1 span { color: var(--red); }
+  .header p {
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-top: 6px;
+    letter-spacing: 0.5px;
+  }
+  .badge {
+    display: inline-block;
+    background: transparent;
+    border: 1px solid var(--red);
+    color: var(--red);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 2px;
+    letter-spacing: 2px;
+    font-family: 'Orbitron', monospace;
+    box-shadow: 0 0 10px var(--red-glow), inset 0 0 10px rgba(233,69,96,0.05);
+    animation: pulse-badge 3s infinite;
+  }
+  @keyframes pulse-badge {
+    0%,100% { box-shadow: 0 0 10px var(--red-glow), inset 0 0 10px rgba(233,69,96,0.05); }
+    50% { box-shadow: 0 0 20px var(--red-glow), inset 0 0 15px rgba(233,69,96,0.1); }
   }
 
-  .container { max-width: 1200px; margin: 0 auto; padding: 24px 20px; }
+  /* CONTAINER */
+  .container { max-width: 1280px; margin: 0 auto; padding: 24px 20px; }
 
+  /* SECTION TITLE */
   .section-title {
-    font-size: 11px; font-weight: 700; letter-spacing: 2px;
-    color: #718096; text-transform: uppercase;
-    border-left: 3px solid #e94560; padding-left: 10px;
-    margin: 28px 0 14px;
+    font-family: 'Orbitron', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: var(--red);
+    text-transform: uppercase;
+    padding: 6px 0 6px 14px;
+    margin: 32px 0 16px;
+    position: relative;
+    border-left: 2px solid var(--red);
+  }
+  .section-title::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 50%;
+    transform: translateY(-50%);
+    width: 2px; height: 100%;
+    background: var(--red);
+    box-shadow: 0 0 8px var(--red-glow);
   }
 
-  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; }
+  /* FILTER BAR */
+  .filter-bar {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px 20px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    align-items: flex-end;
+    margin-bottom: 6px;
+    position: relative;
+    overflow: hidden;
+  }
+  .filter-bar::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--red), transparent);
+  }
+  .filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 140px;
+  }
+  .filter-group label {
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--red);
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+  .filter-group input,
+  .filter-group select {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text);
+    padding: 8px 12px;
+    font-size: 13px;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+  }
+  .filter-group input:focus,
+  .filter-group select:focus {
+    border-color: var(--red);
+    box-shadow: 0 0 8px var(--red-glow);
+  }
+  .filter-group select option { background: #0f0f18; color: var(--text); }
+  .btn-filter {
+    background: var(--red);
+    border: none;
+    color: white;
+    padding: 9px 20px;
+    border-radius: 4px;
+    font-family: 'Orbitron', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 0 12px var(--red-glow);
+    align-self: flex-end;
+  }
+  .btn-filter:hover { background: #ff2d4e; box-shadow: 0 0 20px var(--red-glow); transform: translateY(-1px); }
+  .btn-reset {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    padding: 9px 16px;
+    border-radius: 4px;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    align-self: flex-end;
+  }
+  .btn-reset:hover { border-color: var(--red); color: var(--red); }
+
+  .filter-info {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-bottom: 20px;
+    padding: 0 4px;
+  }
+  .filter-info span { color: var(--red); font-weight: 700; }
+
+  /* VIEW TABS */
+  .view-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  .view-tab {
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    padding: 8px 20px;
+    border-radius: 4px;
+    font-family: 'Orbitron', monospace;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+  }
+  .view-tab:hover { border-color: var(--red); color: var(--red); }
+  .view-tab.active {
+    background: var(--red);
+    border-color: var(--red);
+    color: white;
+    box-shadow: 0 0 14px var(--red-glow);
+  }
+
+  /* VIEWS */
+  .view-panel { display: none; }
+  .view-panel.active { display: block; }
+
+  /* INDIVIDUAL SELECTOR */
+  .individual-selector {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+  .ind-btn {
+    background: var(--card);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    padding: 6px 14px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .ind-btn:hover { border-color: var(--red); color: var(--text); }
+  .ind-btn.active { background: rgba(233,69,96,0.15); border-color: var(--red); color: var(--red); }
+  .role-label {
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    font-family: 'Orbitron', monospace;
+    margin-bottom: 8px;
+    margin-top: 14px;
+  }
+
+  /* KPI GRID */
+  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
   .kpi-card {
-    background: white; border-radius: 10px; padding: 18px 16px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.07); border-top: 3px solid #e94560;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 18px 16px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s, box-shadow 0.2s;
   }
-  .kpi-card.green { border-top-color: #38a169; }
-  .kpi-card.blue { border-top-color: #3182ce; }
-  .kpi-card.orange { border-top-color: #dd6b20; }
-  .kpi-card.purple { border-top-color: #805ad5; }
-  .kpi-card.gray { border-top-color: #718096; }
+  .kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--red);
+    box-shadow: 0 0 10px var(--red-glow);
+  }
+  .kpi-card.green::before { background: var(--green); box-shadow: 0 0 10px rgba(0,255,136,0.4); }
+  .kpi-card.blue::before { background: var(--blue); box-shadow: 0 0 10px rgba(0,180,255,0.4); }
+  .kpi-card.orange::before { background: var(--orange); box-shadow: 0 0 10px rgba(255,140,0,0.4); }
+  .kpi-card.purple::before { background: var(--purple); box-shadow: 0 0 10px rgba(176,96,255,0.4); }
+  .kpi-card:hover {
+    border-color: var(--border-bright);
+    box-shadow: 0 0 20px rgba(233,69,96,0.1);
+  }
+  .kpi-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; right: 0;
+    width: 60px; height: 60px;
+    background: radial-gradient(circle, rgba(233,69,96,0.05) 0%, transparent 70%);
+  }
+  .kpi-label {
+    font-size: 9px;
+    color: var(--text-dim);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    font-family: 'Orbitron', monospace;
+  }
+  .kpi-value {
+    font-size: 32px;
+    font-weight: 900;
+    color: var(--text-bright);
+    margin: 8px 0 2px;
+    font-family: 'Orbitron', monospace;
+    text-shadow: 0 0 20px rgba(255,255,255,0.1);
+    line-height: 1;
+  }
+  .kpi-sub { font-size: 11px; color: var(--text-dim); }
 
-  .kpi-label { font-size: 10px; color: #718096; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; }
-  .kpi-value { font-size: 28px; font-weight: 800; color: #1a1a2e; margin: 6px 0 2px; }
-  .kpi-sub { font-size: 11px; color: #718096; }
-
-  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-
+  /* CARDS */
   .card {
-    background: white; border-radius: 10px; padding: 20px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
   }
-  .card h3 { font-size: 12px; font-weight: 700; color: #4a5568; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 14px; }
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border-bright), transparent);
+  }
+  .card h3 {
+    font-family: 'Orbitron', monospace;
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 16px;
+  }
 
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+
+  /* TABLES */
   table { width: 100%; border-collapse: collapse; }
-  th { background: #f7fafc; font-size: 10px; font-weight: 700; color: #718096;
-       text-transform: uppercase; padding: 8px 10px; text-align: left; border-bottom: 2px solid #e2e8f0; }
-  td { padding: 8px 10px; border-bottom: 1px solid #f0f2f5; font-size: 12px; color: #2d3748; }
-  tr:last-child td { border-bottom: none; }
-  tr:hover td { background: #f7fafc; }
-
-  .bar-wrap { background: #edf2f7; border-radius: 4px; height: 10px; width: 100%; margin-top: 4px; }
-  .bar-fill { height: 10px; border-radius: 4px; background: #3182ce; }
-  .bar-fill.red { background: #e94560; }
-  .bar-fill.green { background: #38a169; }
-  .bar-fill.orange { background: #dd6b20; }
-
-  .tag {
-    display: inline-block; padding: 2px 8px; border-radius: 20px;
-    font-size: 10px; font-weight: 700;
+  th {
+    background: rgba(233,69,96,0.08);
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--red);
+    text-transform: uppercase;
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    letter-spacing: 1.5px;
+    font-family: 'Orbitron', monospace;
   }
-  .tag.q { background: #c6f6d5; color: #276749; }
-  .tag.nq { background: #fed7d7; color: #9b2335; }
-  .tag.warn { background: #feebc8; color: #7b341e; }
-  .tag.info { background: #bee3f8; color: #2a69ac; }
+  td {
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    font-size: 13px;
+    color: var(--text);
+    font-weight: 500;
+    transition: background 0.15s;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(233,69,96,0.05); }
 
+  /* TAGS */
+  .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 2px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    font-family: 'Orbitron', monospace;
+  }
+  .tag.q { background: rgba(0,255,136,0.12); color: var(--green); border: 1px solid rgba(0,255,136,0.3); }
+  .tag.nq { background: rgba(233,69,96,0.12); color: var(--red); border: 1px solid var(--border); }
+  .tag.warn { background: rgba(255,140,0,0.12); color: var(--orange); border: 1px solid rgba(255,140,0,0.3); }
+  .tag.info { background: rgba(0,180,255,0.12); color: var(--blue); border: 1px solid rgba(0,180,255,0.3); }
+
+  /* BAR */
+  .bar-wrap { background: rgba(255,255,255,0.05); border-radius: 2px; height: 6px; width: 100%; margin-top: 4px; }
+  .bar-fill { height: 6px; border-radius: 2px; background: var(--red); box-shadow: 0 0 6px var(--red-glow); }
+  .bar-fill.green { background: var(--green); box-shadow: 0 0 6px rgba(0,255,136,0.4); }
+  .bar-fill.blue { background: var(--blue); box-shadow: 0 0 6px rgba(0,180,255,0.4); }
+  .bar-fill.orange { background: var(--orange); }
+
+  .q-bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .q-bar-label { font-size: 11px; color: var(--text); width: 110px; flex-shrink: 0; font-weight: 600; }
+  .q-bar-wrap { flex: 1; background: rgba(255,255,255,0.05); border-radius: 2px; height: 8px; }
+  .q-bar-fill { height: 8px; border-radius: 2px; }
+  .q-bar-val { font-size: 11px; font-weight: 700; color: var(--text-bright); width: 70px; text-align: right; font-family: 'Orbitron', monospace; }
+
+  /* INSIGHT LIST */
   .insight-list { list-style: none; }
   .insight-list li {
-    padding: 10px 12px; border-radius: 6px; margin-bottom: 8px;
-    font-size: 12px; line-height: 1.6;
-    border-left: 4px solid #ccc;
+    padding: 12px 14px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+    font-size: 13px;
+    line-height: 1.6;
+    border-left: 3px solid var(--border);
+    background: rgba(255,255,255,0.02);
+    transition: background 0.2s;
   }
-  .insight-list li.red { background: #fff5f5; border-color: #e94560; }
-  .insight-list li.green { background: #f0fff4; border-color: #38a169; }
-  .insight-list li.orange { background: #fffaf0; border-color: #dd6b20; }
-  .insight-list li.blue { background: #ebf8ff; border-color: #3182ce; }
-  .insight-list li.purple { background: #faf5ff; border-color: #805ad5; }
+  .insight-list li:hover { background: rgba(255,255,255,0.04); }
+  .insight-list li.red { border-color: var(--red); background: rgba(233,69,96,0.05); }
+  .insight-list li.green { border-color: var(--green); background: rgba(0,255,136,0.04); }
+  .insight-list li.orange { border-color: var(--orange); background: rgba(255,140,0,0.05); }
+  .insight-list li.blue { border-color: var(--blue); background: rgba(0,180,255,0.05); }
 
+  /* CHART CONTAINER */
+  .chart-wrap { position: relative; width: 100%; }
+  .chart-wrap canvas { max-width: 100%; }
+
+  /* AUDIT BOX */
   .audit-box {
-    background: #f7fafc; border: 1px solid #e2e8f0; border-radius: 8px;
-    padding: 16px; font-size: 11px; color: #4a5568; line-height: 1.8;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px 18px;
+    font-size: 12px;
+    color: var(--text-dim);
+    line-height: 2;
   }
-  .audit-box strong { color: #1a1a2e; }
+  .audit-box strong { color: var(--text-bright); }
 
-  .divider { border: none; border-top: 1px solid #e2e8f0; margin: 8px 0; }
+  /* PROFILE CARD */
+  .profile-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .profile-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--red), var(--purple));
+    box-shadow: 0 0 10px var(--red-glow);
+  }
+  .profile-name {
+    font-family: 'Orbitron', monospace;
+    font-size: 14px;
+    font-weight: 900;
+    color: var(--text-bright);
+    margin-bottom: 4px;
+  }
+  .profile-role {
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--red);
+    text-transform: uppercase;
+    font-family: 'Orbitron', monospace;
+    margin-bottom: 16px;
+  }
+  .profile-metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .profile-metric {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 10px;
+    text-align: center;
+  }
+  .profile-metric .pm-val {
+    font-family: 'Orbitron', monospace;
+    font-size: 20px;
+    font-weight: 900;
+    color: var(--text-bright);
+    display: block;
+  }
+  .profile-metric .pm-label {
+    font-size: 9px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 4px;
+  }
 
-  .two-col-insight { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  /* EFFICIENCY METER */
+  .eff-meter {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 8px 0;
+  }
+  .eff-label { font-size: 11px; color: var(--text-dim); width: 120px; }
+  .eff-track { flex: 1; background: rgba(255,255,255,0.06); border-radius: 2px; height: 6px; }
+  .eff-fill { height: 6px; border-radius: 2px; }
+  .eff-val { font-size: 11px; font-weight: 700; color: var(--text-bright); width: 45px; text-align: right; font-family: 'Orbitron', monospace; }
 
-  .q-bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-  .q-bar-label { font-size: 11px; color: #4a5568; width: 90px; flex-shrink: 0; }
-  .q-bar-wrap { flex: 1; background: #edf2f7; border-radius: 4px; height: 10px; }
-  .q-bar-fill { height: 10px; border-radius: 4px; }
-  .q-bar-val { font-size: 11px; font-weight: 700; color: #2d3748; width: 55px; text-align: right; }
-
+  /* FOOTER */
   .footer {
-    text-align: center; margin-top: 30px; padding: 16px;
-    color: #a0aec0; font-size: 10px; border-top: 1px solid #e2e8f0;
+    text-align: center;
+    margin-top: 40px;
+    padding: 20px;
+    color: var(--text-dim);
+    font-size: 10px;
+    border-top: 1px solid var(--border);
+    letter-spacing: 2px;
+    font-family: 'Orbitron', monospace;
   }
+  .footer span { color: var(--red); }
 
-  @media(max-width: 700px) {
-    .grid-2, .two-col-insight { grid-template-columns: 1fr; }
-    .kpi-value { font-size: 22px; }
-    .header h1 { font-size: 17px; }
+  /* DIVIDER */
+  .divider { border: none; border-top: 1px solid rgba(255,255,255,0.05); margin: 14px 0; }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: rgba(233,69,96,0.4); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--red); }
+
+  /* RESPONSIVE */
+  @media(max-width: 768px) {
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    .kpi-value { font-size: 24px; }
+    .header h1 { font-size: 15px; }
     .header { padding: 18px 16px; }
     .container { padding: 16px 10px; }
+    .filter-bar { gap: 10px; }
+    .filter-group { min-width: 120px; }
   }
+
+  /* GLOW ANIMATION */
+  @keyframes glow-line {
+    0%,100% { opacity: 0.5; }
+    50% { opacity: 1; }
+  }
+
+  /* NO DATA MESSAGE */
+  .no-data {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-dim);
+    font-family: 'Orbitron', monospace;
+    font-size: 12px;
+    letter-spacing: 2px;
+  }
+  .no-data span { display: block; font-size: 30px; margin-bottom: 10px; }
 </style>
 </head>
 <body>
 
+<!-- HEADER -->
 <div class="header">
-  <h1>📊 Dashboard — Controle de Sala de Atendimento</h1>
-  <p>Período analisado: <strong>01/01/2026 a 09/06/2026</strong> &nbsp;|&nbsp; Tipo de atendimento: <strong>NoTour (100%)</strong></p>
-  <span class="badge">VISÃO EXECUTIVA</span>
+  <div class="header-top">
+    <div>
+      <h1>⬡ SALA <span>DE ATENDIMENTO</span> // CONTROLE 2026</h1>
+      <p>Período base: <strong style="color:#e8e8f0">01/01/2026 a 09/06/2026</strong> &nbsp;|&nbsp; Atendimentos NoTour &nbsp;|&nbsp; 120 registros válidos</p>
+    </div>
+    <span class="badge">VISÃO EXECUTIVA</span>
+  </div>
 </div>
 
 <div class="container">
 
-  <!-- AUDITORIA -->
-  <div class="section-title">🔍 Auditoria da Base</div>
-  <div class="audit-box">
-    <strong>Registros brutos recebidos:</strong> 120 &nbsp;|&nbsp;
-    <strong>Duplicatas removidas:</strong> 0 &nbsp;|&nbsp;
-    <strong>Base válida para análise:</strong> 120 registros<br>
-    <strong>Critério de deduplicação:</strong> Verificação por Nome 1 + Data de atendimento — nenhuma duplicata detectada.<br>
-    <strong>Observação:</strong> Todos os registros possuem Status = <em>NoTour</em> e Valor vendido = R$ 0,00.
-    A base reflete exclusivamente visitantes que não realizaram o tour/apresentação de vendas.
+  <!-- FILTROS -->
+  <div class="section-title">⬡ FILTROS DE ANÁLISE</div>
+  <div class="filter-bar">
+    <div class="filter-group">
+      <label>Data Inicial</label>
+      <input type="date" id="dtInicio" value="2026-01-01">
+    </div>
+    <div class="filter-group">
+      <label>Data Final</label>
+      <input type="date" id="dtFim" value="2026-06-09">
+    </div>
+    <div class="filter-group">
+      <label>Promotor de Marketing</label>
+      <select id="filtroPromotor">
+        <option value="">Todos</option>
+        <option>Raphael Bueno</option>
+        <option>Francisco A. Rodrigues</option>
+        <option>Josyene Freitas</option>
+        <option>Matheus Esley Silva</option>
+        <option>Larissa Ribeiro</option>
+        <option>Suene Cintia</option>
+        <option>Pedro H. Gomes</option>
+        <option>Luan S. Firmino</option>
+        <option>Outros</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Consultor (Liner)</label>
+      <select id="filtroLiner">
+        <option value="">Todos</option>
+        <option>Renata Dorado</option>
+        <option>Bianca Duarte</option>
+        <option>Karina F. Nascimento</option>
+        <option>Amanda Dorado</option>
+        <option>Ramon S. Pinheiro</option>
+        <option>Guilherme S. Batista</option>
+        <option>Silvia Regina</option>
+        <option>Stella Christy Dias</option>
+        <option>Outros</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Closer</label>
+      <select id="filtroCloser">
+        <option value="">Todos</option>
+        <option>— Sem dados de Closer na base atual —</option>
+      </select>
+    </div>
+    <button class="btn-filter" onclick="aplicarFiltros()">▶ APLICAR</button>
+    <button class="btn-reset" onclick="resetarFiltros()">↺ RESETAR</button>
+  </div>
+  <div class="filter-info" id="filtroInfo">
+    Exibindo: <span>Todo o período</span> &nbsp;|&nbsp; Promotor: <span>Todos</span> &nbsp;|&nbsp; Consultor: <span>Todos</span> &nbsp;|&nbsp; Base: <span>120 registros</span>
   </div>
 
-  <!-- KPIs -->
-  <div class="section-title">📌 Principais KPIs</div>
-  <div class="kpi-grid">
-    <div class="kpi-card">
-      <div class="kpi-label">Total Atendimentos</div>
-      <div class="kpi-value">120</div>
-      <div class="kpi-sub">NoTour — Jan a Jun/26</div>
-    </div>
-    <div class="kpi-card green">
-      <div class="kpi-label">Qualificados (Q)</div>
-      <div class="kpi-value">79</div>
-      <div class="kpi-sub">65,8% do total</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-label">Não Qualificados (NQ)</div>
-      <div class="kpi-value">41</div>
-      <div class="kpi-sub">34,2% do total</div>
-    </div>
-    <div class="kpi-card blue">
-      <div class="kpi-label">Estados Representados</div>
-      <div class="kpi-value">18</div>
-      <div class="kpi-sub">Alcance nacional</div>
-    </div>
-    <div class="kpi-card orange">
-      <div class="kpi-label">Promotores Ativos</div>
-      <div class="kpi-value">28</div>
-      <div class="kpi-sub">Promotores únicos</div>
-    </div>
-    <div class="kpi-card purple">
-      <div class="kpi-label">Liners Ativos</div>
-      <div class="kpi-value">22</div>
-      <div class="kpi-sub">Liners únicos</div>
-    </div>
-    <div class="kpi-card gray">
-      <div class="kpi-label">Com Brindes</div>
-      <div class="kpi-value">12</div>
-      <div class="kpi-sub">10% dos atendimentos</div>
-    </div>
-    <div class="kpi-card" style="border-top-color:#0f3460">
-      <div class="kpi-label">Conversão de Vendas</div>
-      <div class="kpi-value">0%</div>
-      <div class="kpi-sub">R$ 0,00 — base NoTour</div>
-    </div>
+  <!-- TABS DE VISÃO -->
+  <div class="view-tabs">
+    <button class="view-tab active" onclick="trocarView('geral', this)">⬡ VISÃO GERAL</button>
+    <button class="view-tab" onclick="trocarView('promotores', this)">◈ PROMOTORES</button>
+    <button class="view-tab" onclick="trocarView('liners', this)">◈ CONSULTORES (LINERS)</button>
+    <button class="view-tab" onclick="trocarView('closers', this)">◈ CLOSERS</button>
   </div>
 
-  <!-- QUALIFICAÇÃO -->
-  <div class="section-title">✅ Perfil de Qualificação</div>
-  <div class="card">
-    <h3>Distribuição Q × NQ</h3>
-    <div class="q-bar-row">
-      <div class="q-bar-label">Qualificados (Q)</div>
-      <div class="q-bar-wrap">
-        <div class="q-bar-fill" style="width:65.8%;background:#38a169;"></div>
+  <!-- ===================== VIEW: GERAL ===================== -->
+  <div class="view-panel active" id="view-geral">
+
+    <!-- KPIs -->
+    <div class="section-title">⬡ PRINCIPAIS KPIs</div>
+    <div class="kpi-grid" id="kpi-geral">
+      <div class="kpi-card">
+        <div class="kpi-label">Total Atendimentos</div>
+        <div class="kpi-value" id="kpi-total">120</div>
+        <div class="kpi-sub">NoTour — Jan a Jun/26</div>
       </div>
-      <div class="q-bar-val">79 — 65,8%</div>
-    </div>
-    <div class="q-bar-row">
-      <div class="q-bar-label">Não Qualif. (NQ)</div>
-      <div class="q-bar-wrap">
-        <div class="q-bar-fill" style="width:34.2%;background:#e94560;"></div>
+      <div class="kpi-card green">
+        <div class="kpi-label">Qualificados (Q)</div>
+        <div class="kpi-value" id="kpi-q">79</div>
+        <div class="kpi-sub" id="kpi-q-pct">65,8% do total</div>
       </div>
-      <div class="q-bar-val">41 — 34,2%</div>
+      <div class="kpi-card" style="border-top-color:var(--red)">
+        <div class="kpi-label">Não Qualificados (NQ)</div>
+        <div class="kpi-value" id="kpi-nq">41</div>
+        <div class="kpi-sub" id="kpi-nq-pct">34,2% do total</div>
+      </div>
+      <div class="kpi-card blue">
+        <div class="kpi-label">VGV Realizado</div>
+        <div class="kpi-value">R$ 0</div>
+        <div class="kpi-sub">Base exclusiva NoTour</div>
+      </div>
+      <div class="kpi-card orange">
+        <div class="kpi-label">Promotores Ativos</div>
+        <div class="kpi-value">28</div>
+        <div class="kpi-sub">Promotores únicos</div>
+      </div>
+      <div class="kpi-card purple">
+        <div class="kpi-label">Consultores Ativos</div>
+        <div class="kpi-value">22</div>
+        <div class="kpi-sub">Liners únicos</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">% Cancelamento</div>
+        <div class="kpi-value">N/D</div>
+        <div class="kpi-sub">Sem vendas na base</div>
+      </div>
+      <div class="kpi-card green">
+        <div class="kpi-label">Estados Representados</div>
+        <div class="kpi-value">18</div>
+        <div class="kpi-sub">Alcance nacional</div>
+      </div>
     </div>
-    <hr class="divider" style="margin:12px 0">
-    <p style="font-size:11px;color:#718096;line-height:1.7">
-      <strong>Interpretação:</strong> Mais de 1 em cada 3 visitantes não atende aos critérios de qualificação.
-      Em uma operação de tour, esse índice impacta diretamente a taxa de conversão futura e a eficiência do time de vendas.
-    </p>
-  </div>
 
-  <!-- EVOLUÇÃO MENSAL -->
-  <div class="section-title">📅 Volume por Mês</div>
-  <div class="card">
-    <h3>NoTour por mês</h3>
-    <table>
-      <thead>
-        <tr><th>Mês</th><th>Atendimentos</th><th>Q</th><th>NQ</th><th>% NQ</th><th>Volume</th></tr>
-      </thead>
-      <tbody>
-        <tr><td>Janeiro/26</td><td><strong>38</strong></td><td>25</td><td>13</td>
-          <td><span class="tag warn">34,2%</span></td>
-          <td><div class="bar-wrap"><div class="bar-fill" style="width:100%"></div></div></td></tr>
-        <tr><td>Fevereiro/26</td><td><strong>13</strong></td><td>8</td><td>5</td>
-          <td><span class="tag warn">38,5%</span></td>
-          <td><div class="bar-wrap"><div class="bar-fill" style="width:34%"></div></div></td></tr>
-        <tr><td>Março/26</td><td><strong>14</strong></td><td>11</td><td>3</td>
-          <td><span class="tag q">21,4%</span></td>
-          <td><div class="bar-wrap"><div class="bar-fill green" style="width:37%"></div></div></td></tr>
-        <tr><td>Abril/26</td><td><strong>27</strong></td><td>18</td><td>9</td>
-          <td><span class="tag warn">33,3%</span></td>
-          <td><div class="bar-wrap"><div class="bar-fill orange" style="width:71%"></div></div></td></tr>
-        <tr><td>Maio/26</td><td><strong>23</strong></td><td>14</td><td>9</td>
-          <td><span class="tag warn">39,1%</span></td>
-          <td><div class="bar-wrap"><div class="bar-fill orange" style="width:61%"></div></div></td></tr>
-        <tr><td>Junho/26 *</td><td><strong>5</strong></td><td>3</td><td>2</td>
-          <td><span class="tag warn">40,0%</span></td>
-          <td><div class="bar-wrap"><div class="bar-fill red" style="width:13%"></div></div></td></tr>
-      </tbody>
-    </table>
-    <p style="font-size:10px;color:#a0aec0;margin-top:8px">* Junho/26 parcial — dados até dia 09.</p>
-  </div>
+    <!-- GRÁFICOS LINHA + PIZZA -->
+    <div class="section-title">⬡ EVOLUÇÃO & DISTRIBUIÇÃO</div>
+    <div class="grid-2">
+      <div class="card">
+        <h3>Volume Mensal de Atendimentos</h3>
+        <div class="chart-wrap" style="height:220px">
+          <canvas id="chartMensal"></canvas>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Qualificação — Q vs NQ</h3>
+        <div class="chart-wrap" style="height:220px;display:flex;align-items:center;justify-content:center">
+          <canvas id="chartQnq" style="max-height:200px;max-width:200px"></canvas>
+        </div>
+      </div>
+    </div>
 
-  <!-- LOCAIS DE CAPTAÇÃO -->
-  <div class="section-title">📍 Locais de Captação</div>
-  <div class="card">
-    <h3>Volume e qualificação por ponto</h3>
-    <table>
-      <thead>
-        <tr><th>Local</th><th>Total</th><th>Q</th><th>NQ</th><th>% Q</th></tr>
-      </thead>
-      <tbody>
-        <tr><td>Parque Dreams</td><td><strong>38</strong></td><td>24</td><td>14</td><td><span class="tag warn">63,2%</span></td></tr>
-        <tr><td>Frente da Sala Dream</td><td><strong>31</strong></td><td>19</td><td>12</td><td><span class="tag warn">61,3%</span></td></tr>
-        <tr><td>Baden Baden</td><td><strong>21</strong></td><td>13</td><td>8</td><td><span class="tag warn">61,9%</span></td></tr>
-        <tr><td>Esquina 1</td><td><strong>7</strong></td><td>5</td><td>2</td><td><span class="tag q">71,4%</span></td></tr>
-        <tr><td>Agendamento</td><td><strong>4</strong></td><td>4</td><td>0</td><td><span class="tag q">100%</span></td></tr>
-        <tr><td>Dream House</td><td><strong>2</strong></td><td>2</td><td>0</td><td><span class="tag q">100%</span></td></tr>
-        <tr><td>Praça</td><td><strong>2</strong></td><td>2</td><td>0</td><td><span class="tag q">100%</span></td></tr>
-        <tr><td>Outros / Não informado</td><td><strong>15</strong></td><td>10</td><td>5</td><td><span class="tag warn">66,7%</span></td></tr>
-      </tbody>
-    </table>
-    <p style="font-size:11px;color:#718096;margin-top:10px;line-height:1.6">
-      <strong>Destaque:</strong> Agendamento, Dream House e Praça = 100% de qualificação.
-      Parque Dreams e Frente da Sala, apesar do maior volume, têm as menores taxas de Q.
-    </p>
-  </div>
+    <!-- GRÁFICO Q/NQ POR MÊS (BARRAS EMPILHADAS) -->
+    <div class="card" style="margin-top:14px">
+      <h3>Q × NQ por Mês</h3>
+      <div class="chart-wrap" style="height:220px">
+        <canvas id="chartQnqMensal"></canvas>
+      </div>
+    </div>
 
-  <!-- PROMOTORES E LINERS -->
-  <div class="grid-2">
+    <!-- TABELA MENSAL -->
+    <div class="section-title">⬡ DETALHAMENTO MENSAL</div>
     <div class="card">
-      <h3>🎯 Top Promotores (volume)</h3>
+      <h3>Volume, Qualificação e Eficiência por Mês</h3>
       <table>
-        <thead><tr><th>Promotor</th><th>Total</th><th>% Q</th></tr></thead>
+        <thead>
+          <tr><th>Mês</th><th>Atendimentos</th><th>Qualificados</th><th>Não Qualif.</th><th>% Q</th><th>VGV</th><th>% Cancelamento</th></tr>
+        </thead>
         <tbody>
-          <tr><td>Raphael Bueno</td><td>18</td><td><span class="tag warn">61,1%</span></td></tr>
-          <tr><td>Francisco A. Rodrigues</td><td>16</td><td><span class="tag q">75,0%</span></td></tr>
-          <tr><td>Josyene Freitas</td><td>10</td><td><span class="tag q">80,0%</span></td></tr>
-          <tr><td>Matheus Esley Silva</td><td>10</td><td><span class="tag nq">50,0%</span></td></tr>
-          <tr><td>Larissa Ribeiro</td><td>7</td><td><span class="tag warn">57,1%</span></td></tr>
-          <tr><td>Suene Cintia</td><td>5</td><td><span class="tag q">80,0%</span></td></tr>
-          <tr><td>Pedro H. Gomes</td><td>5</td><td><span class="tag warn">60,0%</span></td></tr>
-          <tr><td>Luan S. Firmino</td><td>4</td><td><span class="tag q">75,0%</span></td></tr>
+          <tr><td>Janeiro/26</td><td><strong>38</strong></td><td>25</td><td>13</td><td><span class="tag warn">65,8%</span></td><td>R$ 0,00</td><td><span class="tag info">N/D</span></td></tr>
+          <tr><td>Fevereiro/26</td><td><strong>13</strong></td><td>8</td><td>5</td><td><span class="tag warn">61,5%</span></td><td>R$ 0,00</td><td><span class="tag info">N/D</span></td></tr>
+          <tr><td>Março/26</td><td><strong>14</strong></td><td>11</td><td>3</td><td><span class="tag q">78,6%</span></td><td>R$ 0,00</td><td><span class="tag info">N/D</span></td></tr>
+          <tr><td>Abril/26</td><td><strong>27</strong></td><td>18</td><td>9</td><td><span class="tag warn">66,7%</span></td><td>R$ 0,00</td><td><span class="tag info">N/D</span></td></tr>
+          <tr><td>Maio/26</td><td><strong>23</strong></td><td>14</td><td>9</td><td><span class="tag warn">60,9%</span></td><td>R$ 0,00</td><td><span class="tag info">N/D</span></td></tr>
+          <tr><td>Junho/26 ✳</td><td><strong>5</strong></td><td>3</td><td>2</td><td><span class="tag warn">60,0%</span></td><td>R$ 0,00</td><td><span class="tag info">N/D</span></td></tr>
         </tbody>
       </table>
+      <p style="font-size:10px;color:var(--text-dim);margin-top:8px">✳ Junho/26 parcial — dados até dia 09. &nbsp;|&nbsp; VGV e cancelamento: base exclusivamente NoTour, sem registros de venda.</p>
     </div>
-    <div class="card">
-      <h3>🎙️ Top Liners (volume)</h3>
-      <table>
-        <thead><tr><th>Liner</th><th>Total</th><th>% Q</th></tr></thead>
-        <tbody>
-          <tr><td>Renata Dorado</td><td>28</td><td><span class="tag q">71,4%</span></td></tr>
-          <tr><td>Bianca Duarte</td><td>11</td><td><span class="tag warn">54,5%</span></td></tr>
-          <tr><td>Karina F. Nascimento</td><td>8</td><td><span class="tag warn">62,5%</span></td></tr>
-          <tr><td>Amanda Dorado</td><td>8</td><td><span class="tag warn">62,5%</span></td></tr>
-          <tr><td>Ramon S. Pinheiro</td><td>7</td><td><span class="tag q">85,7%</span></td></tr>
-          <tr><td>Guilherme S. Batista</td><td>7</td><td><span class="tag warn">57,1%</span></td></tr>
-          <tr><td>Silvia Regina</td><td>7</td><td><span class="tag q">71,4%</span></td></tr>
-          <tr><td>Stella Christy Dias</td><td>6</td><td><span class="tag nq">50,0%</span></td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
 
-  <!-- GEOGRAFIA -->
-  <div class="section-title">🗺️ Distribuição Geográfica</div>
-  <div class="grid-2">
-    <div class="card">
-      <h3>Top Estados</h3>
-      <table>
-        <thead><tr><th>UF</th><th>Visitantes</th><th>% Q</th></tr></thead>
-        <tbody>
-          <tr><td><strong>SP</strong></td><td>67</td><td><span class="tag q">67,2%</span></td></tr>
-          <tr><td><strong>MG</strong></td><td>14</td><td><span class="tag warn">57,1%</span></td></tr>
-          <tr><td><strong>RJ</strong></td><td>10</td><td><span class="tag warn">60,0%</span></td></tr>
-          <tr><td><strong>PR</strong></td><td>3</td><td><span class="tag q">66,7%</span></td></tr>
-          <tr><td><strong>PE</strong></td><td>3</td><td><span class="tag warn">66,7%</span></td></tr>
-          <tr><td><strong>BA</strong></td><td>3</td><td><span class="tag warn">66,7%</span></td></tr>
-          <tr><td><strong>MT</strong></td><td>3</td><td><span class="tag q">66,7%</span></td></tr>
-          <tr><td><strong>PA</strong></td><td>2</td><td><span class="tag nq">0%</span></td></tr>
-          <tr><td><strong>CE</strong></td><td>2</td><td><span class="tag q">100%</span></td></tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="card">
-      <h3>Concentração Regional</h3>
-      <div class="q-bar-row">
-        <div class="q-bar-label">SP</div>
-        <div class="q-bar-wrap"><div class="q-bar-fill" style="width:55.8%;background:#3182ce;"></div></div>
-        <div class="q-bar-val">55,8% (67)</div>
+    <!-- GRÁFICO LOCAIS DE CAPTAÇÃO -->
+    <div class="section-title">⬡ LOCAIS DE CAPTAÇÃO</div>
+    <div class="grid-2">
+      <div class="card">
+        <h3>Volume por Local</h3>
+        <div class="chart-wrap" style="height:250px">
+          <canvas id="chartLocais"></canvas>
+        </div>
       </div>
-      <div class="q-bar-row">
-        <div class="q-bar-label">MG</div>
-        <div class="q-bar-wrap"><div class="q-bar-fill" style="width:11.7%;background:#4299e1;"></div></div>
-        <div class="q-bar-val">11,7% (14)</div>
-      </div>
-      <div class="q-bar-row">
-        <div class="q-bar-label">RJ</div>
-        <div class="q-bar-wrap"><div class="q-bar-fill" style="width:8.3%;background:#63b3ed;"></div></div>
-        <div class="q-bar-val">8,3% (10)</div>
-      </div>
-      <div class="q-bar-row">
-        <div class="q-bar-label">Demais UFs</div>
-        <div class="q-bar-wrap"><div class="q-bar-fill" style="width:24.2%;background:#bee3f8;"></div></div>
-        <div class="q-bar-val">24,2% (29)</div>
+      <div class="card">
+        <h3>Taxa de Qualificação por Local</h3>
+        <div class="q-bar-row"><div class="q-bar-label">Agendamento</div><div class="q-bar-wrap"><div class="q-bar-fill" style="width:100%;background:var(--green)"></div></div><div class="q-bar-val" style="color:var(--green)">100%</div></div>
+        <div class="q-bar-row"><div class="q-bar-label">Dream House</div><div class="q-bar-wrap"><div class="q-bar-fill" style="width:100%;background:var(--green)"></div></div><div class="q-bar-val" style="color:var(--green)">100%</div></div>
+        <div class="q-bar-row"><div class="q-bar-label">Praça</div><div class="q-bar-wrap"><div class="q-bar-fill" style="width:100%;background:var(--green)"></div></div><div class="q-bar-val" style="color:var(--green)">100%</div></div>
+        <div class="q-bar-row"><div class="q-bar-label">Esquina 1</div><div class="q-bar-wrap"><div class="q-bar-fill" style="width:71.4%;background:var(--orange)"></div></div><div class="q-bar-val">71,4%</div></div>
+        <div class="q-bar-row"><div class="q-bar-label">Outros</div><div class="q-bar-wrap"><div class="q-bar-fill" style="width:66.7%;background:var(--orange)"></div></div><div class="q-bar-val">66,7%</div></div>
+        <div class="q-bar-row"><div class="q-bar-label">Parque Dreams</div><div class="q-bar-wrap"><div class="q-bar-fill" style="width:63.2%;background:var(--orange)"></div></div><div class="q-bar-val">63,2%</div></div>
+        <div class="q-bar-row"><div class="q-bar-label">Baden Baden</div><div class="q-bar-wrap"><div class="q-bar-fill" style="width:61.9%;background:var(--red)"></div></div><div class="q-bar-val" style="color:var(--red)">61,9%</div></div>
+        <div class="q-bar-row"><div class="q-bar-label">Frente Sala</div><div class="q-bar-wrap"><div class="q-bar-fill" style="width:61.3%;background:var(--red)"></div></div><div class="q-bar-val" style="color:var(--red)">61,3%</div></div>
       </div>
     </div>
-  </div>
 
-  <!-- RENDA -->
-  <div class="section-title">💰 Perfil de Renda Declarada</div>
-  <div class="card">
-    <h3>Qualificação por faixa de renda</h3>
-    <table>
-      <thead><tr><th>Faixa de Renda</th><th>Visitantes</th><th>Q</th><th>NQ</th><th>% Q</th></tr></thead>
-      <tbody>
-        <tr><td>Até R$ 12.000</td><td>22</td><td>9</td><td>13</td><td><span class="tag nq">40,9%</span></td></tr>
-        <tr><td>R$ 13.000 – R$ 15.000</td><td>46</td><td>27</td><td>19</td><td><span class="tag warn">58,7%</span></td></tr>
-        <tr><td>R$ 18.000 – R$ 25.000</td><td>18</td><td>13</td><td>5</td><td><span class="tag q">72,2%</span></td></tr>
-        <tr><td>R$ 30.000 – R$ 50.000</td><td>25</td><td>21</td><td>4</td><td><span class="tag q">84,0%</span></td></tr>
-        <tr><td>R$ 100.000+</td><td>2</td><td>2</td><td>0</td><td><span class="tag q">100%</span></td></tr>
-      </tbody>
-    </table>
-    <p style="font-size:11px;color:#718096;margin-top:10px;line-height:1.6">
-      Taxa de qualificação cresce progressivamente com a renda. Faixas abaixo de R$12k têm 59,1% de NQ —
-      maior desalinhamento entre perfil captado e perfil do produto.
-    </p>
-  </div>
+    <!-- GEOGRAFIA -->
+    <div class="section-title">⬡ DISTRIBUIÇÃO GEOGRÁFICA</div>
+    <div class="grid-2">
+      <div class="card">
+        <h3>Top Estados</h3>
+        <table>
+          <thead><tr><th>UF</th><th>Visitantes</th><th>% Total</th><th>% Q</th></tr></thead>
+          <tbody>
+            <tr><td><strong style="color:var(--red)">SP</strong></td><td>67</td><td>55,8%</td><td><span class="tag q">67,2%</span></td></tr>
+            <tr><td><strong>MG</strong></td><td>14</td><td>11,7%</td><td><span class="tag warn">57,1%</span></td></tr>
+            <tr><td><strong>RJ</strong></td><td>10</td><td>8,3%</td><td><span class="tag warn">60,0%</span></td></tr>
+            <tr><td><strong>PR</strong></td><td>3</td><td>2,5%</td><td><span class="tag q">66,7%</span></td></tr>
+            <tr><td><strong>PE</strong></td><td>3</td><td>2,5%</td><td><span class="tag warn">66,7%</span></td></tr>
+            <tr><td><strong>BA</strong></td><td>3</td><td>2,5%</td><td><span class="tag warn">66,7%</span></td></tr>
+            <tr><td><strong>MT</strong></td><td>3</td><td>2,5%</td><td><span class="tag q">66,7%</span></td></tr>
+            <tr><td><strong>PA</strong></td><td>2</td><td>1,7%</td><td><span class="tag nq">0%</span></td></tr>
+            <tr><td><strong>CE</strong></td><td>2</td><td>1,7%</td><td><span class="tag q">100%</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h3>Concentração por Estado</h3>
+        <div class="chart-wrap" style="height:250px">
+          <canvas id="chartGeo"></canvas>
+        </div>
+      </div>
+    </div>
 
-  <!-- INSIGHTS -->
-  <div class="section-title">🔬 Leituras Estratégicas</div>
-  <ul class="insight-list">
-    <li class="red"><strong>🚨 100% NoTour, R$ 0,00 de receita.</strong> Esta base registra apenas quem não realizou o tour. O destino dessas 120 pessoas no funil precisa ser rastreado.</li>
-    <li class="orange"><strong>⚠️ 34,2% NQ.</strong> ~1 em cada 3 visitantes está fora do perfil. Custo operacional sem retorno potencial direto.</li>
-    <li class="blue"><strong>📊
+    <!-- RENDA -->
+    <div class="section-title">⬡ PERFIL DE RENDA</div>
+    <div class="grid-2">
+      <div class="card">
+        <h3>Qualificação por Faixa de Renda</h3>
+        <div class="chart-wrap" style="height:220px">
+          <canvas id="chartRenda"></canvas>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Leitura por Faixa</h3>
+        <table>
+          <thead><tr><th>Faixa</th><th>Total</th><th>Q</th><th>NQ</th><th>% Q</th></tr></thead>
+          <tbody>
+            <tr><td>Até R$ 12k</td><td>22</td><td>9</td><td>13</td><td><span class="tag nq">40,9%</span></td></tr>
+            <tr><td>R$ 13k–15k</td><td>46</td><td>27</td><td>19</td><td><span class="tag warn">58,7%</span></td></tr>
+            <tr><td>R$ 18k–25k</td><td>18</td><td>13</td><td>5</td><td><span class="tag q">72,2%</span></td></tr>
+            <tr><td>R$ 30k–50k</td><td>25</td><td>21</td><td>4</td><td><span class="tag q">84,0%</span></td></tr>
+            <tr><td>R$ 100k+</td><td>2</td><td>2</td><td>0</td><td><span class="tag q">100%</span></td></tr>
+          </tbody>
+        </table>
+        <hr class="divider">
+        <p style="font-size:11px;color:var(--text-dim);line-height:1.7">Correlação positiva entre renda e qualificação. Faixas &lt; R$12k: 59,1% NQ — maior desalinhamento com o perfil do produto.</p>
+      </div>
+    </div>
+
+    <!-- INSIGHTS -->
+    <div class="section-title">⬡ LEITURAS ESTRATÉGICAS</div>
+    <ul class="insight-list">
+      <li class="red"><strong>🚨 Base 100% NoTour / R$ 0,00 de receita.</strong> Esta base registra apenas visitantes que não realizaram o tour. O destino dessas 120 pessoas no funil precisa ser rastreado para mensurar custo real de captação sem retorno.</li>
+      <li class="orange"><strong>⚠️ 34,2% NQ — 1 em cada 3 visitantes fora do perfil.</strong> Custo operacional sem retorno potencial direto. Requer revisão de critérios de captação em Parque Dreams e Frente da Sala.</li>
+      <li class="blue"><strong>📊 Pontos de captação qualificada.</strong> Agendamento, Dream House e Praça entregam 100% de Q. Escalar esses canais pode melhorar drasticamente a eficiência do funil.</li>
+      <li class="green"><strong>✅ SP concentra 55,8% da base.</strong> Foco geográfico já estabelecido. MG e RJ representam 20% — potencial de aprofundamento regional.</li>
+      <li class="red"><strong>🔴 Faixas de renda baixa com alta taxa NQ.</strong> Renda até R$12k → 59,1% NQ. Revisão do critério de qualificação de renda no momento da captação pode reduzir desperdício.</li>
+    </ul>
+
+    <!-- AUDITORIA -->
+    <div class="section-title">⬡ AUDITORIA DA BASE</div>
+    <div class="audit-box">
+      <strong>Registros brutos:</strong> 120 &nbsp;|&nbsp;
+      <strong>Duplicatas removidas:</strong> 0 &nbsp;|&nbsp;
+      <strong>Base válida:</strong> 120 registros<br>
+      <strong>Critério:</strong> Verificação por Nome 1 + Data — nenhuma duplicata detectada.<br>
+      <strong>Observação:</strong> Status = NoTour (100%). Valor vendido = R$ 0,00 em todos os registros.<br>
+      <strong>VGV e % Cancelamento:</strong> Não calculáveis nesta base — ausência de vendas registradas. Indicadores ficarão disponíveis quando dados de Tour/Venda forem adicionados.
+    </div>
+
+  </div><!-- /view-geral -->
+
+  <!-- ===================== VIEW: PROMOTORES ===================== -->
+  <div class="view-panel" id="view-promotores">
+    <div class="section-title">⬡ VISÃO INDIVIDUAL — PROMOTORES DE MARKETING</div>
+
+    <!-- RANKING GERAL -->
+    <div class="grid-2">
+      <div class="card">
+        <h3>Ranking — Volume Captado</h3>
+        <div class="chart-wrap" style="height:260px">
+          <canvas id="chartPromoVol"></canvas>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Ranking — Eficiência de Qualificação (%Q)</h3>
+        <div class="chart-wrap" style="height:260px">
+          <canvas id="chartPromoQ"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- SELECTOR -->
+    <div class="section-title">⬡ PERFIL INDIVIDUAL</div>
+    <div class="role-label">Selecione o promotor:</div>
+    <div class="individual-selector" id="selectorPromotor"></div>
+    <div id="perfilPromotor"></div>
+
+  </div><!-- /view-promotores -->
+
+  <!-- ===================== VIEW: LINERS ===================== -->
+  <div class="view-panel" id="view-liners">
+    <div class="section-title">⬡ VISÃO INDIVIDUAL — CONSULTORES (LINERS)</div>
+
+    <div class="grid-2">
+      <div class="card">
+        <h3>Ranking — Volume Atendido</h3>
+        <div class="chart-wrap" style="height:260px">
+          <canvas id="chartLinerVol"></canvas>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Ranking — Eficiência de Qualificação (%Q)</h3>
+        <div class="chart-wrap" style="height:260px">
+          <canvas id="chartLinerQ"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title">⬡ PERFIL INDIVIDUAL</div>
+    <div class="role-label">Selecione o consultor:</div>
+    <div class="individual-selector" id="selectorLiner"></div>
+    <div id="perfilLiner"></div>
+
+  </div><!-- /view-liners -->
+
+  <!-- ===================== VIEW: CLOSERS ===================== -->
+  <div class="view-panel" id="view-closers">
+    <div class="section-title">⬡ CLOSERS</div>
+    <div class="card">
+      <div class="no-data">
+        <span>◎</span>
+        DADOS DE CLOSER NÃO DISPONÍVEIS NA BASE ATUAL<br>
+        <span style="font-size:10px;margin-top:8px;display:block;color:var(--text-dim)">
+          A base recebida não contém coluna de Closer atribuído por atendimento.<br>
+          Esta seção será ativada automaticamente quando os dados forem fornecidos.
+        </span>
+      </div>
+    </div>
+  </div><!-- /view-closers -->
+
+</div><!-- /container -->
+
+<div class="footer">
+  DASHBOARD GERADO AUTOMATICAMENTE &nbsp;|&nbsp; <span>CONTROLE DE SALA 2026</span> &nbsp;|&nbsp; BASE: 120 REGISTROS &nbsp;|&nbsp; NOTOUR
+</div>
+
+<!-- ===================== SCRIPTS ===================== -->
+<script>
+// ======= DADOS BASE =======
+const dadosPromotor = [
+  { nome: "Raphael Bueno",         total: 18, q: 11, nq: 7  },
+  { nome: "Francisco A. Rodrigues",total: 16, q: 12, nq: 4  },
+  { nome: "Josyene Freitas",       total: 10, q: 8,  nq: 2  },
+  { nome: "Matheus Esley Silva",   total: 10, q: 5,  nq: 5  },
+  { nome: "Larissa Ribeiro",       total: 7,  q: 4,  nq: 3  },
+  { nome: "Suene Cintia",          total: 5,  q: 4,  nq: 1  },
+  { nome: "Pedro H. Gomes",        total: 5,  q: 3,  nq: 2  },
+  { nome: "Luan S. Firmino",       total: 4,  q: 3,  nq: 1  },
+  { nome: "Demais (20)",           total: 45, q: 29, nq: 16 }
+];
+
+const dadosLiner = [
+  { nome: "Renata Dorado",        total: 28, q: 20, nq: 8  },
+  { nome: "Bianca Duarte",        total: 11, q: 6,  nq: 5  },
+  { nome: "Karina F. Nascimento", total: 8,  q: 5,  nq: 3  },
+  { nome: "Amanda Dorado",        total: 8,  q: 5,  nq: 3  },
+  { nome: "Ramon S. Pinheiro",    total: 7,  q: 6,  nq: 1  },
+  { nome: "Guilherme S. Batista", total: 7,  q: 4,  nq: 3  },
+  { nome: "Silvia Regina",        total: 7,  q: 5,  nq: 2  },
+  { nome: "Stella Christy Dias",  total: 6,  q: 3,  nq: 3  },
+  { nome: "Demais (14)",          total: 38, q: 25, nq: 13 }
+];
+
+const dadosMensais = {
+  meses: ["Jan","Fev","Mar","Abr","Mai","Jun*"],
+  total: [38,13,14,27,23,5],
+  q:     
