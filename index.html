@@ -6,617 +6,667 @@
 <title>Dashboard | Controle de Sala 2026</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&display=swap');
 
-  :root {
-    --red: #e94560;
-    --red-dark: #c0392b;
-    --red-glow: rgba(233,69,96,0.4);
-    --bg: #050508;
-    --bg2: #0a0a10;
-    --bg3: #0f0f18;
-    --card: #0d0d16;
-    --card2: #12121e;
-    --border: rgba(233,69,96,0.25);
-    --border-bright: rgba(233,69,96,0.7);
-    --text: #e8e8f0;
-    --text-dim: #7a7a9a;
-    --text-bright: #ffffff;
-    --green: #00ff88;
-    --green-dim: rgba(0,255,136,0.15);
-    --blue: #00b4ff;
-    --orange: #ff8c00;
-    --purple: #b060ff;
-  }
+:root {
+  --bg:        #000000;
+  --bg2:       #050505;
+  --bg3:       #080808;
+  --card:      #0a0a0a;
+  --card2:     #0e0e0e;
+  --bordeaux:  #8b0000;
+  --bordeaux2: #a00000;
+  --bordeaux3: #c00020;
+  --glow:      rgba(180,0,30,0.55);
+  --glow2:     rgba(180,0,30,0.25);
+  --text:      #f0e0e0;
+  --text-dim:  #7a5555;
+  --text-bright:#fff5f5;
+  --cyan:      #00ffe0;
+  --cyan-glow: rgba(0,255,224,0.4);
+  --gold:      #ffcc00;
+  --gold-glow: rgba(255,204,0,0.4);
+  --purple:    #cc44ff;
+  --purple-glow:rgba(204,68,255,0.4);
+  --green:     #00ff88;
+  --green-glow:rgba(0,255,136,0.4);
+  --orange:    #ff6600;
+  --orange-glow:rgba(255,102,0,0.4);
+  --blue:      #0088ff;
+  --blue-glow: rgba(0,136,255,0.4);
+}
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  body {
-    font-family: 'Rajdhani', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    font-size: 14px;
-    min-height: 100vh;
-    background-image:
-      radial-gradient(ellipse at 20% 0%, rgba(233,69,96,0.08) 0%, transparent 50%),
-      radial-gradient(ellipse at 80% 100%, rgba(233,69,96,0.05) 0%, transparent 50%);
-  }
+html { scroll-behavior: smooth; }
 
-  /* SCANLINES EFFECT */
-  body::before {
-    content: '';
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 2px,
-      rgba(0,0,0,0.03) 2px,
-      rgba(0,0,0,0.03) 4px
-    );
-    pointer-events: none;
-    z-index: 9999;
-  }
+body {
+  font-family: 'Rajdhani', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
 
-  /* HEADER */
-  .header {
-    background: linear-gradient(180deg, #0a0a12 0%, #080810 100%);
-    border-bottom: 1px solid var(--border-bright);
-    padding: 24px 36px;
-    position: relative;
-    overflow: hidden;
-  }
-  .header::before {
-    content: '';
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--red), transparent);
-    box-shadow: 0 0 20px var(--red-glow);
-  }
-  .header::after {
-    content: '';
-    position: absolute;
-    top: -50%;
-    left: -10%;
-    width: 120%;
-    height: 200%;
-    background: radial-gradient(ellipse, rgba(233,69,96,0.04) 0%, transparent 60%);
-    pointer-events: none;
-  }
-  .header-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 12px;
-  }
-  .header h1 {
-    font-family: 'Orbitron', monospace;
-    font-size: 20px;
-    font-weight: 900;
-    color: var(--text-bright);
-    letter-spacing: 2px;
-    text-shadow: 0 0 20px var(--red-glow);
-  }
-  .header h1 span { color: var(--red); }
-  .header p {
-    font-size: 12px;
-    color: var(--text-dim);
-    margin-top: 6px;
-    letter-spacing: 0.5px;
-  }
-  .badge {
-    display: inline-block;
-    background: transparent;
-    border: 1px solid var(--red);
-    color: var(--red);
-    font-size: 10px;
-    font-weight: 700;
-    padding: 4px 12px;
-    border-radius: 2px;
-    letter-spacing: 2px;
-    font-family: 'Orbitron', monospace;
-    box-shadow: 0 0 10px var(--red-glow), inset 0 0 10px rgba(233,69,96,0.05);
-    animation: pulse-badge 3s infinite;
-  }
-  @keyframes pulse-badge {
-    0%,100% { box-shadow: 0 0 10px var(--red-glow), inset 0 0 10px rgba(233,69,96,0.05); }
-    50% { box-shadow: 0 0 20px var(--red-glow), inset 0 0 15px rgba(233,69,96,0.1); }
-  }
+/* ── GRID DE FUNDO PULSANTE ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(139,0,0,0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(139,0,0,0.07) 1px, transparent 1px);
+  background-size: 40px 40px;
+  animation: grid-pulse 4s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+@keyframes grid-pulse {
+  0%,100% { opacity: 0.4; }
+  50%      { opacity: 1; }
+}
 
-  /* CONTAINER */
-  .container { max-width: 1280px; margin: 0 auto; padding: 24px 20px; }
+/* ── PARTÍCULAS ── */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 15% 20%, rgba(139,0,0,0.12) 0%, transparent 45%),
+    radial-gradient(ellipse at 85% 80%, rgba(139,0,0,0.10) 0%, transparent 45%),
+    radial-gradient(ellipse at 50% 50%, rgba(80,0,0,0.06) 0%, transparent 60%);
+  animation: particles 6s ease-in-out infinite alternate;
+  pointer-events: none;
+  z-index: 0;
+}
+@keyframes particles {
+  0%   { transform: scale(1) rotate(0deg); opacity: 0.6; }
+  100% { transform: scale(1.08) rotate(1deg); opacity: 1; }
+}
 
-  /* SECTION TITLE */
-  .section-title {
-    font-family: 'Orbitron', monospace;
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 3px;
-    color: var(--red);
-    text-transform: uppercase;
-    padding: 6px 0 6px 14px;
-    margin: 32px 0 16px;
-    position: relative;
-    border-left: 2px solid var(--red);
-  }
-  .section-title::before {
-    content: '';
-    position: absolute;
-    left: 0; top: 50%;
-    transform: translateY(-50%);
-    width: 2px; height: 100%;
-    background: var(--red);
-    box-shadow: 0 0 8px var(--red-glow);
-  }
+/* ── TUDO ACIMA DO BG ── */
+.header, .container, .footer { position: relative; z-index: 1; }
 
-  /* FILTER BAR */
-  .filter-bar {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 16px 20px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 14px;
-    align-items: flex-end;
-    margin-bottom: 6px;
-    position: relative;
-    overflow: hidden;
-  }
-  .filter-bar::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--red), transparent);
-  }
-  .filter-group {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    min-width: 140px;
-  }
-  .filter-group label {
-    font-size: 9px;
-    letter-spacing: 2px;
-    color: var(--red);
-    font-family: 'Orbitron', monospace;
-    font-weight: 700;
-    text-transform: uppercase;
-  }
-  .filter-group input,
-  .filter-group select {
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    color: var(--text);
-    padding: 8px 12px;
-    font-size: 13px;
-    font-family: 'Rajdhani', sans-serif;
-    font-weight: 600;
-    outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
-    cursor: pointer;
-  }
-  .filter-group input:focus,
-  .filter-group select:focus {
-    border-color: var(--red);
-    box-shadow: 0 0 8px var(--red-glow);
-  }
-  .filter-group select option { background: #0f0f18; color: var(--text); }
-  .btn-filter {
-    background: var(--red);
-    border: none;
-    color: white;
-    padding: 9px 20px;
-    border-radius: 4px;
-    font-family: 'Orbitron', monospace;
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    cursor: pointer;
-    transition: all 0.2s;
-    box-shadow: 0 0 12px var(--red-glow);
-    align-self: flex-end;
-  }
-  .btn-filter:hover { background: #ff2d4e; box-shadow: 0 0 20px var(--red-glow); transform: translateY(-1px); }
-  .btn-reset {
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--text-dim);
-    padding: 9px 16px;
-    border-radius: 4px;
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-    align-self: flex-end;
-  }
-  .btn-reset:hover { border-color: var(--red); color: var(--red); }
+/* ══════════════════════════════════
+   HEADER
+══════════════════════════════════ */
+.header {
+  background: linear-gradient(180deg, #050000 0%, #000000 100%);
+  border-bottom: 1px solid var(--bordeaux);
+  padding: 28px 36px 22px;
+  position: relative;
+  overflow: hidden;
+}
+.header::before {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent 0%, var(--bordeaux3) 30%, var(--bordeaux3) 70%, transparent 100%);
+  box-shadow: 0 0 24px var(--glow), 0 0 60px var(--glow2);
+  animation: header-line 3s ease-in-out infinite;
+}
+@keyframes header-line {
+  0%,100% { opacity: 0.7; box-shadow: 0 0 24px var(--glow); }
+  50%      { opacity: 1;   box-shadow: 0 0 50px var(--glow), 0 0 100px var(--glow2); }
+}
+.header-inner { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 14px; }
+.header-logo {
+  display: flex; align-items: center; gap: 14px;
+}
+.logo-hex {
+  width: 52px; height: 52px;
+  background: var(--bordeaux);
+  clip-path: polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Orbitron', monospace;
+  font-size: 18px; font-weight: 900;
+  color: white;
+  box-shadow: 0 0 20px var(--glow), 0 0 40px var(--glow2);
+  animation: hex-pulse 2.5s ease-in-out infinite;
+  flex-shrink: 0;
+}
+@keyframes hex-pulse {
+  0%,100% { box-shadow: 0 0 20px var(--glow); transform: scale(1); }
+  50%      { box-shadow: 0 0 40px var(--glow), 0 0 80px var(--glow2); transform: scale(1.05); }
+}
+.header h1 {
+  font-family: 'Orbitron', monospace;
+  font-size: 19px; font-weight: 900;
+  color: var(--text-bright);
+  letter-spacing: 2px;
+  text-shadow: 0 0 14px var(--glow), 0 0 30px var(--glow2);
+  line-height: 1.3;
+}
+.header h1 em {
+  color: var(--bordeaux3);
+  font-style: normal;
+  text-shadow: 0 0 20px var(--glow), 0 0 50px var(--glow2);
+  animation: text-glow 2s ease-in-out infinite;
+}
+@keyframes text-glow {
+  0%,100% { text-shadow: 0 0 10px var(--glow); }
+  50%      { text-shadow: 0 0 30px var(--glow), 0 0 60px var(--glow2); }
+}
+.header p { font-size: 12px; color: var(--text-dim); margin-top: 5px; letter-spacing: 0.5px; }
+.header p strong { color: #c08080; }
 
-  .filter-info {
-    font-size: 11px;
-    color: var(--text-dim);
-    margin-bottom: 20px;
-    padding: 0 4px;
-  }
-  .filter-info span { color: var(--red); font-weight: 700; }
+.badge {
+  display: inline-block;
+  background: transparent;
+  border: 1px solid var(--bordeaux3);
+  color: var(--bordeaux3);
+  font-size: 9px; font-weight: 700;
+  padding: 6px 16px; border-radius: 2px;
+  letter-spacing: 3px;
+  font-family: 'Orbitron', monospace;
+  box-shadow: 0 0 14px var(--glow), inset 0 0 14px rgba(180,0,30,0.08);
+  animation: badge-pulse 3s ease-in-out infinite;
+  align-self: flex-start;
+  margin-top: 4px;
+}
+@keyframes badge-pulse {
+  0%,100% { box-shadow: 0 0 14px var(--glow); }
+  50%      { box-shadow: 0 0 30px var(--glow), inset 0 0 20px rgba(180,0,30,0.15); }
+}
 
-  /* VIEW TABS */
-  .view-tabs {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-  }
-  .view-tab {
-    background: var(--card);
-    border: 1px solid var(--border);
-    color: var(--text-dim);
-    padding: 8px 20px;
-    border-radius: 4px;
-    font-family: 'Orbitron', monospace;
-    font-size: 9px;
-    font-weight: 700;
-    letter-spacing: 1.5px;
-    cursor: pointer;
-    transition: all 0.2s;
-    text-transform: uppercase;
-  }
-  .view-tab:hover { border-color: var(--red); color: var(--red); }
-  .view-tab.active {
-    background: var(--red);
-    border-color: var(--red);
-    color: white;
-    box-shadow: 0 0 14px var(--red-glow);
-  }
+/* ══════════════════════════════════
+   CONTAINER
+══════════════════════════════════ */
+.container { max-width: 1300px; margin: 0 auto; padding: 28px 22px; }
 
-  /* VIEWS */
-  .view-panel { display: none; }
-  .view-panel.active { display: block; }
+/* ══════════════════════════════════
+   SECTION TITLE
+══════════════════════════════════ */
+.section-title {
+  font-family: 'Orbitron', monospace;
+  font-size: 9px; font-weight: 700;
+  letter-spacing: 4px;
+  color: var(--bordeaux3);
+  text-transform: uppercase;
+  padding: 7px 0 7px 16px;
+  margin: 34px 0 18px;
+  position: relative;
+  text-shadow: 0 0 10px var(--glow);
+}
+.section-title::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0; width: 2px;
+  background: var(--bordeaux3);
+  box-shadow: 0 0 12px var(--glow), 0 0 24px var(--glow2);
+  animation: side-line 2.5s ease-in-out infinite;
+}
+@keyframes side-line {
+  0%,100% { box-shadow: 0 0 8px var(--glow); }
+  50%      { box-shadow: 0 0 20px var(--glow), 0 0 40px var(--glow2); }
+}
+.section-title::after {
+  content: '';
+  position: absolute;
+  left: 16px; bottom: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, rgba(139,0,0,0.4), transparent);
+}
 
-  /* INDIVIDUAL SELECTOR */
-  .individual-selector {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin-bottom: 20px;
-  }
-  .ind-btn {
-    background: var(--card);
-    border: 1px solid var(--border);
-    color: var(--text-dim);
-    padding: 6px 14px;
-    border-radius: 4px;
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  .ind-btn:hover { border-color: var(--red); color: var(--text); }
-  .ind-btn.active { background: rgba(233,69,96,0.15); border-color: var(--red); color: var(--red); }
-  .role-label {
-    font-size: 9px;
-    letter-spacing: 2px;
-    color: var(--text-dim);
-    text-transform: uppercase;
-    font-family: 'Orbitron', monospace;
-    margin-bottom: 8px;
-    margin-top: 14px;
-  }
+/* ══════════════════════════════════
+   FILTER BAR
+══════════════════════════════════ */
+.filter-bar {
+  background: linear-gradient(135deg, #050000 0%, #080000 100%);
+  border: 1px solid rgba(139,0,0,0.4);
+  border-radius: 4px;
+  padding: 18px 22px;
+  display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end;
+  position: relative; overflow: hidden;
+  box-shadow: 0 0 30px rgba(139,0,0,0.1), inset 0 0 30px rgba(139,0,0,0.04);
+}
+.filter-bar::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--bordeaux3), transparent);
+  box-shadow: 0 0 16px var(--glow);
+  animation: filter-top 3s ease-in-out infinite;
+}
+@keyframes filter-top {
+  0%,100% { opacity: 0.6; }
+  50%      { opacity: 1; }
+}
+.filter-group { display: flex; flex-direction: column; gap: 7px; min-width: 145px; }
+.filter-group label {
+  font-size: 8px; letter-spacing: 2.5px;
+  color: var(--bordeaux3);
+  font-family: 'Orbitron', monospace;
+  font-weight: 700;
+  text-transform: uppercase;
+  text-shadow: 0 0 8px var(--glow);
+}
+.filter-group input,
+.filter-group select {
+  background: #050000;
+  border: 1px solid rgba(139,0,0,0.35);
+  border-radius: 3px;
+  color: var(--text);
+  padding: 9px 12px;
+  font-size: 13px;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 600;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+}
+.filter-group input:focus,
+.filter-group select:focus {
+  border-color: var(--bordeaux3);
+  box-shadow: 0 0 12px var(--glow);
+}
+.filter-group select option { background: #050000; color: var(--text); }
+.btn-filter {
+  background: var(--bordeaux);
+  border: 1px solid var(--bordeaux3);
+  color: #ffe0e0;
+  padding: 10px 22px; border-radius: 3px;
+  font-family: 'Orbitron', monospace;
+  font-size: 9px; font-weight: 700; letter-spacing: 2px;
+  cursor: pointer; transition: all 0.2s;
+  box-shadow: 0 0 16px var(--glow);
+  align-self: flex-end;
+  animation: btn-pulse 3s ease-in-out infinite;
+}
+@keyframes btn-pulse {
+  0%,100% { box-shadow: 0 0 16px var(--glow); }
+  50%      { box-shadow: 0 0 28px var(--glow), 0 0 50px var(--glow2); }
+}
+.btn-filter:hover { background: var(--bordeaux3); transform: translateY(-2px); box-shadow: 0 0 30px var(--glow); }
+.btn-reset {
+  background: transparent;
+  border: 1px solid rgba(139,0,0,0.3);
+  color: var(--text-dim);
+  padding: 10px 16px; border-radius: 3px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: all 0.2s;
+  align-self: flex-end;
+}
+.btn-reset:hover { border-color: var(--bordeaux3); color: var(--bordeaux3); }
 
-  /* KPI GRID */
-  .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
-  .kpi-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 18px 16px;
-    position: relative;
-    overflow: hidden;
-    transition: border-color 0.2s, box-shadow 0.2s;
-  }
-  .kpi-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-    background: var(--red);
-    box-shadow: 0 0 10px var(--red-glow);
-  }
-  .kpi-card.green::before { background: var(--green); box-shadow: 0 0 10px rgba(0,255,136,0.4); }
-  .kpi-card.blue::before { background: var(--blue); box-shadow: 0 0 10px rgba(0,180,255,0.4); }
-  .kpi-card.orange::before { background: var(--orange); box-shadow: 0 0 10px rgba(255,140,0,0.4); }
-  .kpi-card.purple::before { background: var(--purple); box-shadow: 0 0 10px rgba(176,96,255,0.4); }
-  .kpi-card:hover {
-    border-color: var(--border-bright);
-    box-shadow: 0 0 20px rgba(233,69,96,0.1);
-  }
-  .kpi-card::after {
-    content: '';
-    position: absolute;
-    bottom: 0; right: 0;
-    width: 60px; height: 60px;
-    background: radial-gradient(circle, rgba(233,69,96,0.05) 0%, transparent 70%);
-  }
-  .kpi-label {
-    font-size: 9px;
-    color: var(--text-dim);
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    font-family: 'Orbitron', monospace;
-  }
-  .kpi-value {
-    font-size: 32px;
-    font-weight: 900;
-    color: var(--text-bright);
-    margin: 8px 0 2px;
-    font-family: 'Orbitron', monospace;
-    text-shadow: 0 0 20px rgba(255,255,255,0.1);
-    line-height: 1;
-  }
-  .kpi-sub { font-size: 11px; color: var(--text-dim); }
+.filter-info {
+  font-size: 11px; color: var(--text-dim);
+  margin: 8px 0 20px; padding: 0 4px;
+  letter-spacing: 0.3px;
+}
+.filter-info span { color: var(--bordeaux3); font-weight: 700; text-shadow: 0 0 8px var(--glow); }
 
-  /* CARDS */
-  .card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 20px;
-    position: relative;
-    overflow: hidden;
-  }
-  .card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--border-bright), transparent);
-  }
-  .card h3 {
-    font-family: 'Orbitron', monospace;
-    font-size: 9px;
-    font-weight: 700;
-    color: var(--text-dim);
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    margin-bottom: 16px;
-  }
+/* ══════════════════════════════════
+   VIEW TABS
+══════════════════════════════════ */
+.view-tabs { display: flex; gap: 6px; margin-bottom: 22px; flex-wrap: wrap; }
+.view-tab {
+  background: #050000;
+  border: 1px solid rgba(139,0,0,0.3);
+  color: var(--text-dim);
+  padding: 10px 22px; border-radius: 3px;
+  font-family: 'Orbitron', monospace;
+  font-size: 8px; font-weight: 700; letter-spacing: 2px;
+  cursor: pointer; transition: all 0.2s;
+  text-transform: uppercase;
+}
+.view-tab:hover { border-color: var(--bordeaux3); color: var(--bordeaux3); box-shadow: 0 0 12px var(--glow2); }
+.view-tab.active {
+  background: var(--bordeaux);
+  border-color: var(--bordeaux3);
+  color: #fff5f5;
+  box-shadow: 0 0 20px var(--glow), inset 0 0 20px rgba(180,0,30,0.15);
+  text-shadow: 0 0 8px rgba(255,200,200,0.5);
+}
 
-  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+/* ══════════════════════════════════
+   VIEWS
+══════════════════════════════════ */
+.view-panel { display: none; }
+.view-panel.active { display: block; }
 
-  /* TABLES */
-  table { width: 100%; border-collapse: collapse; }
-  th {
-    background: rgba(233,69,96,0.08);
-    font-size: 9px;
-    font-weight: 700;
-    color: var(--red);
-    text-transform: uppercase;
-    padding: 10px 12px;
-    text-align: left;
-    border-bottom: 1px solid var(--border);
-    letter-spacing: 1.5px;
-    font-family: 'Orbitron', monospace;
-  }
-  td {
-    padding: 10px 12px;
-    border-bottom: 1px solid rgba(255,255,255,0.04);
-    font-size: 13px;
-    color: var(--text);
-    font-weight: 500;
-    transition: background 0.15s;
-  }
-  tr:last-child td { border-bottom: none; }
-  tr:hover td { background: rgba(233,69,96,0.05); }
+/* ══════════════════════════════════
+   KPI CARDS
+══════════════════════════════════ */
+.kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(165px, 1fr)); gap: 12px; }
+.kpi-card {
+  background: linear-gradient(135deg, #070000 0%, #050000 100%);
+  border: 1px solid rgba(139,0,0,0.35);
+  border-radius: 4px;
+  padding: 20px 16px;
+  position: relative; overflow: hidden;
+  transition: all 0.3s;
+  cursor: default;
+}
+.kpi-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: var(--bordeaux3);
+  box-shadow: 0 0 14px var(--glow), 0 0 28px var(--glow2);
+  animation: kpi-top 3s ease-in-out infinite;
+}
+@keyframes kpi-top {
+  0%,100% { box-shadow: 0 0 10px var(--glow); opacity: 0.8; }
+  50%      { box-shadow: 0 0 24px var(--glow), 0 0 50px var(--glow2); opacity: 1; }
+}
+.kpi-card.cyan::before   { background: var(--cyan);   box-shadow: 0 0 14px var(--cyan-glow); animation: none; }
+.kpi-card.gold::before   { background: var(--gold);   box-shadow: 0 0 14px var(--gold-glow); animation: none; }
+.kpi-card.purple::before { background: var(--purple); box-shadow: 0 0 14px var(--purple-glow); animation: none; }
+.kpi-card.green::before  { background: var(--green);  box-shadow: 0 0 14px var(--green-glow); animation: none; }
+.kpi-card.orange::before { background: var(--orange); box-shadow: 0 0 14px var(--orange-glow); animation: none; }
 
-  /* TAGS */
-  .tag {
-    display: inline-block;
-    padding: 2px 8px;
-    border-radius: 2px;
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-    font-family: 'Orbitron', monospace;
-  }
-  .tag.q { background: rgba(0,255,136,0.12); color: var(--green); border: 1px solid rgba(0,255,136,0.3); }
-  .tag.nq { background: rgba(233,69,96,0.12); color: var(--red); border: 1px solid var(--border); }
-  .tag.warn { background: rgba(255,140,0,0.12); color: var(--orange); border: 1px solid rgba(255,140,0,0.3); }
-  .tag.info { background: rgba(0,180,255,0.12); color: var(--blue); border: 1px solid rgba(0,180,255,0.3); }
+.kpi-card::after {
+  content: '';
+  position: absolute; bottom: -20px; right: -20px;
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(139,0,0,0.08) 0%, transparent 70%);
+}
+.kpi-card:hover {
+  border-color: var(--bordeaux3);
+  box-shadow: 0 0 20px var(--glow2), 0 0 40px rgba(139,0,0,0.08);
+  transform: translateY(-2px);
+}
+.kpi-label {
+  font-size: 8px; color: var(--text-dim);
+  font-weight: 700; text-transform: uppercase;
+  letter-spacing: 2px; font-family: 'Orbitron', monospace;
+}
+.kpi-value {
+  font-size: 30px; font-weight: 900;
+  color: var(--text-bright);
+  margin: 10px 0 3px;
+  font-family: 'Orbitron', monospace;
+  text-shadow: 0 0 16px rgba(255,200,200,0.3);
+  line-height: 1;
+  animation: val-glow 3s ease-in-out infinite;
+}
+@keyframes val-glow {
+  0%,100% { text-shadow: 0 0 10px rgba(255,200,200,0.2); }
+  50%      { text-shadow: 0 0 24px rgba(255,200,200,0.5); }
+}
+.kpi-sub { font-size: 11px; color: var(--text-dim); }
 
-  /* BAR */
-  .bar-wrap { background: rgba(255,255,255,0.05); border-radius: 2px; height: 6px; width: 100%; margin-top: 4px; }
-  .bar-fill { height: 6px; border-radius: 2px; background: var(--red); box-shadow: 0 0 6px var(--red-glow); }
-  .bar-fill.green { background: var(--green); box-shadow: 0 0 6px rgba(0,255,136,0.4); }
-  .bar-fill.blue { background: var(--blue); box-shadow: 0 0 6px rgba(0,180,255,0.4); }
-  .bar-fill.orange { background: var(--orange); }
+/* ══════════════════════════════════
+   CARDS
+══════════════════════════════════ */
+.card {
+  background: linear-gradient(135deg, #070000 0%, #050000 100%);
+  border: 1px solid rgba(139,0,0,0.3);
+  border-radius: 4px;
+  padding: 22px;
+  position: relative; overflow: hidden;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+.card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(192,0,32,0.6), transparent);
+  animation: card-top 4s ease-in-out infinite;
+}
+@keyframes card-top {
+  0%,100% { opacity: 0.4; }
+  50%      { opacity: 1; }
+}
+.card:hover {
+  border-color: rgba(192,0,32,0.6);
+  box-shadow: 0 0 24px rgba(139,0,0,0.12);
+}
+.card h3 {
+  font-family: 'Orbitron', monospace;
+  font-size: 8px; font-weight: 700;
+  color: var(--bordeaux3); text-transform: uppercase;
+  letter-spacing: 2.5px; margin-bottom: 18px;
+  text-shadow: 0 0 8px var(--glow);
+}
 
-  .q-bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-  .q-bar-label { font-size: 11px; color: var(--text); width: 110px; flex-shrink: 0; font-weight: 600; }
-  .q-bar-wrap { flex: 1; background: rgba(255,255,255,0.05); border-radius: 2px; height: 8px; }
-  .q-bar-fill { height: 8px; border-radius: 2px; }
-  .q-bar-val { font-size: 11px; font-weight: 700; color: var(--text-bright); width: 70px; text-align: right; font-family: 'Orbitron', monospace; }
+/* ══════════════════════════════════
+   GRIDS
+══════════════════════════════════ */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
 
-  /* INSIGHT LIST */
-  .insight-list { list-style: none; }
-  .insight-list li {
-    padding: 12px 14px;
-    border-radius: 4px;
-    margin-bottom: 8px;
-    font-size: 13px;
-    line-height: 1.6;
-    border-left: 3px solid var(--border);
-    background: rgba(255,255,255,0.02);
-    transition: background 0.2s;
-  }
-  .insight-list li:hover { background: rgba(255,255,255,0.04); }
-  .insight-list li.red { border-color: var(--red); background: rgba(233,69,96,0.05); }
-  .insight-list li.green { border-color: var(--green); background: rgba(0,255,136,0.04); }
-  .insight-list li.orange { border-color: var(--orange); background: rgba(255,140,0,0.05); }
-  .insight-list li.blue { border-color: var(--blue); background: rgba(0,180,255,0.05); }
+/* ══════════════════════════════════
+   TABLES
+══════════════════════════════════ */
+table { width: 100%; border-collapse: collapse; }
+th {
+  background: rgba(139,0,0,0.12);
+  font-size: 8px; font-weight: 700;
+  color: var(--bordeaux3); text-transform: uppercase;
+  padding: 11px 12px; text-align: left;
+  border-bottom: 1px solid rgba(139,0,0,0.3);
+  letter-spacing: 2px; font-family: 'Orbitron', monospace;
+  text-shadow: 0 0 6px var(--glow);
+}
+td {
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(139,0,0,0.08);
+  font-size: 13px; color: var(--text); font-weight: 500;
+  transition: background 0.15s;
+}
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: rgba(139,0,0,0.06); }
 
-  /* CHART CONTAINER */
-  .chart-wrap { position: relative; width: 100%; }
-  .chart-wrap canvas { max-width: 100%; }
+/* ══════════════════════════════════
+   TAGS
+══════════════════════════════════ */
+.tag {
+  display: inline-block; padding: 2px 9px;
+  border-radius: 2px; font-size: 9px; font-weight: 700;
+  letter-spacing: 0.5px; font-family: 'Orbitron', monospace;
+}
+.tag.q    { background: rgba(0,255,136,0.10); color: var(--green); border: 1px solid rgba(0,255,136,0.3); }
+.tag.nq   { background: rgba(192,0,32,0.12);  color: #ff4060;      border: 1px solid rgba(192,0,32,0.4); }
+.tag.warn { background: rgba(255,102,0,0.10); color: var(--orange); border: 1px solid rgba(255,102,0,0.3); }
+.tag.info { background: rgba(0,136,255,0.10); color: var(--blue);   border: 1px solid rgba(0,136,255,0.3); }
 
-  /* AUDIT BOX */
-  .audit-box {
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 16px 18px;
-    font-size: 12px;
-    color: var(--text-dim);
-    line-height: 2;
-  }
-  .audit-box strong { color: var(--text-bright); }
+/* ══════════════════════════════════
+   Q-BAR
+══════════════════════════════════ */
+.q-bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 11px; }
+.q-bar-label { font-size: 11px; color: var(--text); width: 115px; flex-shrink: 0; font-weight: 600; }
+.q-bar-wrap  { flex: 1; background: rgba(255,255,255,0.04); border-radius: 2px; height: 7px; }
+.q-bar-fill  { height: 7px; border-radius: 2px; transition: width 0.8s ease; }
+.q-bar-val   { font-size: 10px; font-weight: 700; color: var(--text-bright); width: 70px; text-align: right; font-family: 'Orbitron', monospace; }
 
-  /* PROFILE CARD */
-  .profile-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 20px;
-    position: relative;
-    overflow: hidden;
-  }
-  .profile-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, var(--red), var(--purple));
-    box-shadow: 0 0 10px var(--red-glow);
-  }
-  .profile-name {
-    font-family: 'Orbitron', monospace;
-    font-size: 14px;
-    font-weight: 900;
-    color: var(--text-bright);
-    margin-bottom: 4px;
-  }
-  .profile-role {
-    font-size: 10px;
-    letter-spacing: 2px;
-    color: var(--red);
-    text-transform: uppercase;
-    font-family: 'Orbitron', monospace;
-    margin-bottom: 16px;
-  }
-  .profile-metrics {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-    gap: 10px;
-    margin-bottom: 16px;
-  }
-  .profile-metric {
-    background: var(--bg3);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 10px;
-    text-align: center;
-  }
-  .profile-metric .pm-val {
-    font-family: 'Orbitron', monospace;
-    font-size: 20px;
-    font-weight: 900;
-    color: var(--text-bright);
-    display: block;
-  }
-  .profile-metric .pm-label {
-    font-size: 9px;
-    color: var(--text-dim);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-top: 4px;
-  }
+/* ══════════════════════════════════
+   INSIGHT LIST
+══════════════════════════════════ */
+.insight-list { list-style: none; }
+.insight-list li {
+  padding: 13px 16px; border-radius: 3px; margin-bottom: 9px;
+  font-size: 13px; line-height: 1.7;
+  border-left: 3px solid rgba(139,0,0,0.3);
+  background: rgba(255,255,255,0.01);
+  transition: all 0.2s;
+}
+.insight-list li:hover { background: rgba(139,0,0,0.05); transform: translateX(4px); }
+.insight-list li.red    { border-color: var(--bordeaux3); background: rgba(139,0,0,0.06); }
+.insight-list li.green  { border-color: var(--green);     background: rgba(0,255,136,0.03); }
+.insight-list li.orange { border-color: var(--orange);    background: rgba(255,102,0,0.04); }
+.insight-list li.blue   { border-color: var(--blue);      background: rgba(0,136,255,0.04); }
+.insight-list li.cyan   { border-color: var(--cyan);      background: rgba(0,255,224,0.03); }
 
-  /* EFFICIENCY METER */
-  .eff-meter {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin: 8px 0;
-  }
-  .eff-label { font-size: 11px; color: var(--text-dim); width: 120px; }
-  .eff-track { flex: 1; background: rgba(255,255,255,0.06); border-radius: 2px; height: 6px; }
-  .eff-fill { height: 6px; border-radius: 2px; }
-  .eff-val { font-size: 11px; font-weight: 700; color: var(--text-bright); width: 45px; text-align: right; font-family: 'Orbitron', monospace; }
+/* ══════════════════════════════════
+   CHART WRAP
+══════════════════════════════════ */
+.chart-wrap { position: relative; width: 100%; }
 
-  /* FOOTER */
-  .footer {
-    text-align: center;
-    margin-top: 40px;
-    padding: 20px;
-    color: var(--text-dim);
-    font-size: 10px;
-    border-top: 1px solid var(--border);
-    letter-spacing: 2px;
-    font-family: 'Orbitron', monospace;
-  }
-  .footer span { color: var(--red); }
+/* ══════════════════════════════════
+   AUDIT BOX
+══════════════════════════════════ */
+.audit-box {
+  background: #030000;
+  border: 1px solid rgba(139,0,0,0.25);
+  border-radius: 4px; padding: 18px 20px;
+  font-size: 12px; color: var(--text-dim); line-height: 2;
+}
+.audit-box strong { color: #c08080; }
 
-  /* DIVIDER */
-  .divider { border: none; border-top: 1px solid rgba(255,255,255,0.05); margin: 14px 0; }
+/* ══════════════════════════════════
+   PROFILE CARD
+══════════════════════════════════ */
+.profile-card {
+  background: linear-gradient(135deg, #070000 0%, #030000 100%);
+  border: 1px solid rgba(192,0,32,0.4);
+  border-radius: 4px; padding: 24px;
+  position: relative; overflow: hidden;
+  box-shadow: 0 0 30px rgba(139,0,0,0.1);
+}
+.profile-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--bordeaux), var(--purple), var(--bordeaux));
+  box-shadow: 0 0 16px var(--glow);
+  animation: profile-top 3s ease-in-out infinite;
+}
+@keyframes profile-top {
+  0%,100% { background-position: 0% 50%; box-shadow: 0 0 16px var(--glow); }
+  50%      { background-position: 100% 50%; box-shadow: 0 0 30px var(--glow), 0 0 60px var(--purple-glow); }
+}
+.profile-name {
+  font-family: 'Orbitron', monospace;
+  font-size: 15px; font-weight: 900;
+  color: var(--text-bright); margin-bottom: 4px;
+  text-shadow: 0 0 14px var(--glow);
+}
+.profile-role {
+  font-size: 8px; letter-spacing: 3px;
+  color: var(--bordeaux3); text-transform: uppercase;
+  font-family: 'Orbitron', monospace; margin-bottom: 20px;
+  text-shadow: 0 0 8px var(--glow);
+}
+.profile-metrics {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(100px,1fr));
+  gap: 10px; margin-bottom: 18px;
+}
+.profile-metric {
+  background: #030000; border: 1px solid rgba(139,0,0,0.25);
+  border-radius: 3px; padding: 12px; text-align: center;
+  transition: all 0.2s;
+}
+.profile-metric:hover { border-color: var(--bordeaux3); box-shadow: 0 0 12px var(--glow2); }
+.profile-metric .pm-val {
+  font-family: 'Orbitron', monospace;
+  font-size: 22px; font-weight: 900;
+  color: var(--text-bright); display: block;
+  text-shadow: 0 0 12px rgba(255,200,200,0.3);
+}
+.profile-metric .pm-label { font-size: 8px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; }
 
-  /* SCROLLBAR */
-  ::-webkit-scrollbar { width: 6px; height: 6px; }
-  ::-webkit-scrollbar-track { background: var(--bg); }
-  ::-webkit-scrollbar-thumb { background: rgba(233,69,96,0.4); border-radius: 3px; }
-  ::-webkit-scrollbar-thumb:hover { background: var(--red); }
+.eff-meter { display: flex; align-items: center; gap: 10px; margin: 9px 0; }
+.eff-label { font-size: 11px; color: var(--text-dim); width: 130px; }
+.eff-track { flex: 1; background: rgba(255,255,255,0.04); border-radius: 2px; height: 6px; }
+.eff-fill  { height: 6px; border-radius: 2px; transition: width 1s ease; }
+.eff-val   { font-size: 10px; font-weight: 700; color: var(--text-bright); width: 45px; text-align: right; font-family: 'Orbitron', monospace; }
 
-  /* RESPONSIVE */
-  @media(max-width: 768px) {
-    .grid-2, .grid-3 { grid-template-columns: 1fr; }
-    .kpi-value { font-size: 24px; }
-    .header h1 { font-size: 15px; }
-    .header { padding: 18px 16px; }
-    .container { padding: 16px 10px; }
-    .filter-bar { gap: 10px; }
-    .filter-group { min-width: 120px; }
-  }
+/* ══════════════════════════════════
+   INDIVIDUAL SELECTOR
+══════════════════════════════════ */
+.individual-selector { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 18px; }
+.ind-btn {
+  background: #050000; border: 1px solid rgba(139,0,0,0.3);
+  color: var(--text-dim); padding: 7px 14px;
+  border-radius: 3px; font-size: 12px; font-weight: 600;
+  cursor: pointer; transition: all 0.2s;
+}
+.ind-btn:hover { border-color: var(--bordeaux3); color: var(--text); }
+.ind-btn.active {
+  background: rgba(139,0,0,0.2); border-color: var(--bordeaux3);
+  color: var(--bordeaux3); box-shadow: 0 0 10px var(--glow2);
+  text-shadow: 0 0 6px var(--glow);
+}
+.role-label {
+  font-size: 8px; letter-spacing: 2.5px; color: var(--text-dim);
+  text-transform: uppercase; font-family: 'Orbitron', monospace;
+  margin-bottom: 10px; margin-top: 14px;
+}
 
-  /* GLOW ANIMATION */
-  @keyframes glow-line {
-    0%,100% { opacity: 0.5; }
-    50% { opacity: 1; }
-  }
+/* ══════════════════════════════════
+   DIVIDER
+══════════════════════════════════ */
+.divider { border: none; border-top: 1px solid rgba(139,0,0,0.15); margin: 14px 0; }
 
-  /* NO DATA MESSAGE */
-  .no-data {
-    text-align: center;
-    padding: 40px 20px;
-    color: var(--text-dim);
-    font-family: 'Orbitron', monospace;
-    font-size: 12px;
-    letter-spacing: 2px;
-  }
-  .no-data span { display: block; font-size: 30px; margin-bottom: 10px; }
+/* ══════════════════════════════════
+   PULSE RING — decorativo
+══════════════════════════════════ */
+.pulse-ring {
+  display: inline-block; width: 8px; height: 8px;
+  border-radius: 50%; background: var(--bordeaux3);
+  box-shadow: 0 0 6px var(--glow);
+  animation: ring-pulse 1.8s ease-in-out infinite;
+  vertical-align: middle; margin-right: 6px;
+}
+@keyframes ring-pulse {
+  0%   { transform: scale(1);   box-shadow: 0 0 0 0 var(--glow); }
+  50%  { transform: scale(1.2); box-shadow: 0 0 0 6px rgba(180,0,30,0); }
+  100% { transform: scale(1);   box-shadow: 0 0 0 0 rgba(180,0,30,0); }
+}
+
+/* ══════════════════════════════════
+   NO DATA
+══════════════════════════════════ */
+.no-data {
+  text-align: center; padding: 50px 20px;
+  color: var(--text-dim); font-family: 'Orbitron', monospace;
+  font-size: 11px; letter-spacing: 2px;
+}
+.no-data .nd-icon { font-size: 36px; margin-bottom: 14px; display: block; opacity: 0.4; }
+
+/* ══════════════════════════════════
+   SCROLLBAR
+══════════════════════════════════ */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: #000; }
+::-webkit-scrollbar-thumb { background: rgba(139,0,0,0.5); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--bordeaux3); }
+
+/* ══════════════════════════════════
+   FOOTER
+══════════════════════════════════ */
+.footer {
+  text-align: center; margin-top: 50px; padding: 22px;
+  color: var(--text-dim); font-size: 9px;
+  border-top: 1px solid rgba(139,0,0,0.2);
+  letter-spacing: 3px; font-family: 'Orbitron', monospace;
+}
+.footer span { color: var(--bordeaux3); text-shadow: 0 0 8px var(--glow); }
+
+/* ══════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════ */
+@media(max-width: 768px) {
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  .kpi-value { font-size: 24px; }
+  .header h1 { font-size: 14px; }
+  .header { padding: 18px 16px; }
+  .container { padding: 16px 12px; }
+  .filter-bar { gap: 10px; }
+  .filter-group { min-width: 130px; }
+}
 </style>
 </head>
 <body>
 
-<!-- HEADER -->
+<!-- ══════════ HEADER ══════════ -->
 <div class="header">
-  <div class="header-top">
-    <div>
-      <h1>⬡ SALA <span>DE ATENDIMENTO</span> // CONTROLE 2026</h1>
-      <p>Período base: <strong style="color:#e8e8f0">01/01/2026 a 09/06/2026</strong> &nbsp;|&nbsp; Atendimentos NoTour &nbsp;|&nbsp; 120 registros válidos</p>
+  <div class="header-inner">
+    <div class="header-logo">
+      <div class="logo-hex">SA</div>
+      <div>
+        <h1>CONTROLE DE <em>SALA</em> // DASHBOARD 2026</h1>
+        <p>Período: <strong>01/01/2026 → 09/06/2026</strong> &nbsp;·&nbsp; Tipo: <strong>NoTour (100%)</strong> &nbsp;·&nbsp; Base: <strong>120 registros válidos</strong></p>
+      </div>
     </div>
-    <span class="badge">VISÃO EXECUTIVA</span>
+    <span class="badge">⬡ VISÃO EXECUTIVA</span>
   </div>
 </div>
 
 <div class="container">
 
-  <!-- FILTROS -->
-  <div class="section-title">⬡ FILTROS DE ANÁLISE</div>
+  <!-- ══════════ FILTROS ══════════ -->
+  <div class="section-title"><span class="pulse-ring"></span>FILTROS DE ANÁLISE</div>
   <div class="filter-bar">
     <div class="filter-group">
       <label>Data Inicial</label>
@@ -642,7 +692,7 @@
       </select>
     </div>
     <div class="filter-group">
-      <label>Consultor (Liner)</label>
+      <label>Consultor / Liner</label>
       <select id="filtroLiner">
         <option value="">Todos</option>
         <option>Renata Dorado</option>
@@ -660,148 +710,155 @@
       <label>Closer</label>
       <select id="filtroCloser">
         <option value="">Todos</option>
-        <option>— Sem dados de Closer na base atual —</option>
+        <option disabled>— Base atual sem dados de Closer —</option>
       </select>
     </div>
     <button class="btn-filter" onclick="aplicarFiltros()">▶ APLICAR</button>
-    <button class="btn-reset" onclick="resetarFiltros()">↺ RESETAR</button>
+    <button class="btn-reset" onclick="resetarFiltros()">↺ RESET</button>
   </div>
   <div class="filter-info" id="filtroInfo">
-    Exibindo: <span>Todo o período</span> &nbsp;|&nbsp; Promotor: <span>Todos</span> &nbsp;|&nbsp; Consultor: <span>Todos</span> &nbsp;|&nbsp; Base: <span>120 registros</span>
+    Exibindo: <span>Todo o período</span> &nbsp;|&nbsp; Promotor: <span>Todos</span> &nbsp;|&nbsp; Consultor: <span>Todos</span> &nbsp;|&nbsp; Registros: <span>120</span>
   </div>
 
-  <!-- TABS DE VISÃO -->
+  <!-- ══════════ TABS ══════════ -->
   <div class="view-tabs">
-    <button class="view-tab active" onclick="trocarView('geral', this)">⬡ VISÃO GERAL</button>
-    <button class="view-tab" onclick="trocarView('promotores', this)">◈ PROMOTORES</button>
-    <button class="view-tab" onclick="trocarView('liners', this)">◈ CONSULTORES (LINERS)</button>
-    <button class="view-tab" onclick="trocarView('closers', this)">◈ CLOSERS</button>
+    <button class="view-tab active" onclick="trocarView('geral',this)">⬡ VISÃO GERAL</button>
+    <button class="view-tab" onclick="trocarView('promotores',this)">◈ PROMOTORES</button>
+    <button class="view-tab" onclick="trocarView('liners',this)">◈ CONSULTORES</button>
+    <button class="view-tab" onclick="trocarView('closers',this)">◈ CLOSERS</button>
   </div>
 
-  <!-- ===================== VIEW: GERAL ===================== -->
+  <!-- ══════════════════════════════════════════
+       VIEW: GERAL
+  ══════════════════════════════════════════ -->
   <div class="view-panel active" id="view-geral">
 
-    <!-- KPIs -->
-    <div class="section-title">⬡ PRINCIPAIS KPIs</div>
-    <div class="kpi-grid" id="kpi-geral">
+    <div class="section-title"><span class="pulse-ring"></span>PRINCIPAIS KPIs</div>
+    <div class="kpi-grid">
       <div class="kpi-card">
         <div class="kpi-label">Total Atendimentos</div>
-        <div class="kpi-value" id="kpi-total">120</div>
-        <div class="kpi-sub">NoTour — Jan a Jun/26</div>
+        <div class="kpi-value">120</div>
+        <div class="kpi-sub">NoTour · Jan–Jun/26</div>
       </div>
       <div class="kpi-card green">
         <div class="kpi-label">Qualificados (Q)</div>
-        <div class="kpi-value" id="kpi-q">79</div>
-        <div class="kpi-sub" id="kpi-q-pct">65,8% do total</div>
+        <div class="kpi-value" style="color:var(--green);text-shadow:0 0 20px var(--green-glow)">79</div>
+        <div class="kpi-sub">65,8% do total</div>
       </div>
-      <div class="kpi-card" style="border-top-color:var(--red)">
+      <div class="kpi-card">
         <div class="kpi-label">Não Qualificados (NQ)</div>
-        <div class="kpi-value" id="kpi-nq">41</div>
-        <div class="kpi-sub" id="kpi-nq-pct">34,2% do total</div>
+        <div class="kpi-value" style="color:#ff4060;text-shadow:0 0 20px rgba(255,64,96,0.5)">41</div>
+        <div class="kpi-sub">34,2% do total</div>
       </div>
-      <div class="kpi-card blue">
+      <div class="kpi-card cyan">
         <div class="kpi-label">VGV Realizado</div>
-        <div class="kpi-value">R$ 0</div>
-        <div class="kpi-sub">Base exclusiva NoTour</div>
+        <div class="kpi-value" style="color:var(--cyan);text-shadow:0 0 20px var(--cyan-glow)">R$0</div>
+        <div class="kpi-sub">Base NoTour exclusiva</div>
       </div>
-      <div class="kpi-card orange">
+      <div class="kpi-card gold">
         <div class="kpi-label">Promotores Ativos</div>
-        <div class="kpi-value">28</div>
+        <div class="kpi-value" style="color:var(--gold);text-shadow:0 0 20px var(--gold-glow)">28</div>
         <div class="kpi-sub">Promotores únicos</div>
       </div>
       <div class="kpi-card purple">
         <div class="kpi-label">Consultores Ativos</div>
-        <div class="kpi-value">22</div>
+        <div class="kpi-value" style="color:var(--purple);text-shadow:0 0 20px var(--purple-glow)">22</div>
         <div class="kpi-sub">Liners únicos</div>
+      </div>
+      <div class="kpi-card orange">
+        <div class="kpi-label">Estados Alcançados</div>
+        <div class="kpi-value" style="color:var(--orange);text-shadow:0 0 20px var(--orange-glow)">18</div>
+        <div class="kpi-sub">Alcance nacional</div>
       </div>
       <div class="kpi-card">
         <div class="kpi-label">% Cancelamento</div>
-        <div class="kpi-value">N/D</div>
+        <div class="kpi-value" style="color:var(--text-dim)">N/D</div>
         <div class="kpi-sub">Sem vendas na base</div>
-      </div>
-      <div class="kpi-card green">
-        <div class="kpi-label">Estados Representados</div>
-        <div class="kpi-value">18</div>
-        <div class="kpi-sub">Alcance nacional</div>
       </div>
     </div>
 
-    <!-- GRÁFICOS LINHA + PIZZA -->
-    <div class="section-title">⬡ EVOLUÇÃO & DISTRIBUIÇÃO</div>
+    <!-- GRÁFICOS ROW 1 -->
+    <div class="section-title"><span class="pulse-ring"></span>EVOLUÇÃO & DISTRIBUIÇÃO</div>
     <div class="grid-2">
       <div class="card">
         <h3>Volume Mensal de Atendimentos</h3>
-        <div class="chart-wrap" style="height:220px">
+        <div class="chart-wrap" style="height:230px">
           <canvas id="chartMensal"></canvas>
         </div>
       </div>
       <div class="card">
-        <h3>Qualificação — Q vs NQ</h3>
-        <div class="chart-wrap" style="height:220px;display:flex;align-items:center;justify-content:center">
-          <canvas id="chartQnq" style="max-height:200px;max-width:200px"></canvas>
+        <h3>Qualificação Geral — Q vs NQ</h3>
+        <div class="chart-wrap" style="height:230px;display:flex;align-items:center;justify-content:center">
+          <canvas id="chartQnq" style="max-height:210px;max-width:210px"></canvas>
         </div>
       </div>
     </div>
 
-    <!-- GRÁFICO Q/NQ POR MÊS (BARRAS EMPILHADAS) -->
+    <!-- BARRAS EMPILHADAS -->
     <div class="card" style="margin-top:14px">
-      <h3>Q × NQ por Mês</h3>
-      <div class="chart-wrap" style="height:220px">
+      <h3>Q × NQ por Mês — Barras Comparativas</h3>
+      <div class="chart-wrap" style="height:230px">
         <canvas id="chartQnqMensal"></canvas>
       </div>
     </div>
 
     <!-- TABELA MENSAL -->
-    <div class="section-title">⬡ DETALHAMENTO MENSAL</div>
+    <div class="section-title"><span class="pulse-ring"></span>DETALHAMENTO MENSAL</div>
     <div class="card">
-      <h3>Volume, Qualificação e Eficiência por Mês</h3>
+      <h3>Volume, Qualificação, VGV e % Cancelamento por Mês</h3>
       <table>
         <thead>
-          <tr><th>Mês</th><th>Atendimentos</th><th>Qualificados</th><th>Não Qualif.</th><th>% Q</th><th>VGV</th><th>% Cancelamento</th></tr>
+          <tr><th>Mês</th><th>Atendimentos</th><th>Q</th><th>NQ</th><th>% Q</th><th>VGV</th><th>% Cancelamento</th></tr>
         </thead>
         <tbody>
-          <tr><td>Janeiro/26</td><td><strong>38</strong></td><td>25</td><td>13</td><td><span class="tag warn">65,8%</span></td><td>R$ 0,00</td><td><span class="tag info">N/D</span></td></tr>
-          <tr><td>Fevereiro/26</td><td><strong>13</strong></td><td>8</td><td>5</td><td><span class="tag warn">61,5%</span></td><td>R$ 0,00</td><td><span class="tag info">N/D</span></td></tr>
-          <tr><td>Março/26</td><td><strong>14</strong></td><td>11</td><td>3</td><td><span class="tag q">78,6%</span></td><td>R$ 0,00</td><td><span class="tag info">N/D</span></td></tr>
-          <tr><td>Abril/26</td><td><strong>27</strong></td><td>18</td><td>9</td><td><span class="tag warn">66,7%</span></td><td>R$ 0,00</td><td><span class="tag info">N/D</span></td></tr>
-          <tr><td>Maio/26</td><td><strong>23</strong></td><td>14</td><td>9</td><td><span class="tag warn">60,9%</span></td><td>R$ 0,00</td><td><span class="tag info">N/D</span></td></tr>
-          <tr><td>Junho/26 ✳</td><td><strong>5</strong></td><td>3</td><td>2</td><td><span class="tag warn">60,0%</span></td><td>R$ 0,00</td><td><span class="tag info">N/D</span></td></tr>
+          <tr><td>Janeiro/26</td><td><strong>38</strong></td><td>25</td><td>13</td><td><span class="tag warn">65,8%</span></td><td style="color:var(--text-dim)">R$ 0,00</td><td><span class="tag info">N/D</span></td></tr>
+          <tr><td>Fevereiro/26</td><td><strong>13</strong></td><td>8</td><td>5</td><td><span class="tag warn">61,5%</span></td><td style="color:var(--text-dim)">R$ 0,00</td><td><span class="tag info">N/D</span></td></tr>
+          <tr><td>Março/26</td><td><strong>14</strong></td><td>11</td><td>3</td><td><span class="tag q">78,6%</span></td><td style="color:var(--text-dim)">R$ 0,00</td><td><span class="tag info">N/D</span></td></tr>
+          <tr><td>Abril/26</td><td><strong>27</strong></td><td>18</td><td>9</td><td><span class="tag warn">66,7%</span></td><td style="color:var(--text-dim)">R$ 0,00</td><td><span class="tag info">N/D</span></td></tr>
+          <tr><td>Maio/26</td><td><strong>23</strong></td><td>14</td><td>9</td><td><span class="tag warn">60,9%</span></td><td style="color:var(--text-dim)">R$ 0,00</td><td><span class="tag info">N/D</span></td></tr>
+          <tr><td>Junho/26 ✳</td><td><strong>5</strong></td><td>3</td><td>2</td><td><span class="tag warn">60,0%</span></td><td style="color:var(--text-dim)">R$ 0,00</td><td><span class="tag info">N/D</span></td></tr>
         </tbody>
       </table>
-      <p style="font-size:10px;color:var(--text-dim);margin-top:8px">✳ Junho/26 parcial — dados até dia 09. &nbsp;|&nbsp; VGV e cancelamento: base exclusivamente NoTour, sem registros de venda.</p>
+      <p style="font-size:10px;color:var(--text-dim);margin-top:10px">✳ Junho/26 parcial — dados até 09/06. &nbsp;·&nbsp; VGV e cancelamento indisponíveis nesta base (exclusivamente NoTour).</p>
     </div>
 
-    <!-- GRÁFICO LOCAIS DE CAPTAÇÃO -->
-    <div class="section-title">⬡ LOCAIS DE CAPTAÇÃO</div>
+    <!-- LOCAIS -->
+    <div class="section-title"><span class="pulse-ring"></span>LOCAIS DE CAPTAÇÃO</div>
     <div class="grid-2">
       <div class="card">
-        <h3>Volume por Local</h3>
-        <div class="chart-wrap" style="height:250px">
+        <h3>Volume por Ponto de Captação</h3>
+        <div class="chart-wrap" style="height:270px">
           <canvas id="chartLocais"></canvas>
         </div>
       </div>
       <div class="card">
         <h3>Taxa de Qualificação por Local</h3>
-        <div class="q-bar-row"><div class="q-bar-label">Agendamento</div><div class="q-bar-wrap"><div class="q-bar-fill" style="width:100%;background:var(--green)"></div></div><div class="q-bar-val" style="color:var(--green)">100%</div></div>
-        <div class="q-bar-row"><div class="q-bar-label">Dream House</div><div class="q-bar-wrap"><div class="q-bar-fill" style="width:100%;background:var(--green)"></div></div><div class="q-bar-val" style="color:var(--green)">100%</div></div>
-        <div class="q-bar-row"><div class="q-bar-label">Praça</div><div class="q-bar-wrap"><div class="q-bar-fill" style="width:100%;background:var(--green)"></div></div><div class="q-bar-val" style="color:var(--green)">100%</div></div>
-        <div class="q-bar-row"><div class="q-bar-label">Esquina 1</div><div class="q-bar-wrap"><div class="q-bar-fill" style="width:71.4%;background:var(--orange)"></div></div><div class="q-bar-val">71,4%</div></div>
-        <div class="q-bar-row"><div class="q-bar-label">Outros</div><div class="q-bar-wrap"><div class="q-bar-fill" style="width:66.7%;background:var(--orange)"></div></div><div class="q-bar-val">66,7%</div></div>
-        <div class="q-bar-row"><div class="q-bar-label">Parque Dreams</div><div class="q-bar-wrap"><div class="q-bar-fill" style="width:63.2%;background:var(--orange)"></div></div><div class="q-bar-val">63,2%</div></div>
-        <div class="q-bar-row"><div class="q-bar-label">Baden Baden</div><div class="q-bar-wrap"><div class="q-bar-fill" style="width:61.9%;background:var(--red)"></div></div><div class="q-bar-val" style="color:var(--red)">61,9%</div></div>
-        <div class="q-bar-row"><div class="q-bar-label">Frente Sala</div><div class="q-bar-wrap"><div class="q-bar-fill" style="width:61.3%;background:var(--red)"></div></div><div class="q-bar-val" style="color:var(--red)">61,3%</div></div>
+        <div class="q-bar-row"><div class="q-bar-label">Agendamento</div><div class="q-bar-wrap"><div class="q-bar-fill" style="width:100%;background:var(--green);box-shadow:0 0 8px var(--green-glow)"></div></div><div class="q-bar-val" style="color:var(--green)">100%</div></div>
+        <div class="q-bar-row"><div class="q-bar-label">Dream House</div><div class="q-bar-wrap"><div class="q-bar-fill" style="width:100%;background:var(--green);box-shadow:0 0 8px var(--green-glow)"></div></div><div class="q-bar-val" style="color:var(--green)">100%</div></div>
+        <div class="q-bar-row"><div class="q-bar-label">Praça</div><div class="q-bar-wrap"><div class="q-bar-fill" style="width:100%;background:var(--green);box-shadow:0 0 8px var(--green-glow)"></div></div><div class="q-bar-val" style="color:var(--green)">100%</div></div>
+        <div class="q-bar-row"><div class="q-bar-label">Esquina 1</div><div class="q-bar-wrap"><div class="q-bar-fill" style="width:71.4%;background:var(--cyan);box-shadow:0 0 8px var(--cyan-glow)"></div></div><div class="q-bar-val" style="color:var(--cyan)">71,4%</div></div>
+        <div class="q-bar-row"><div class="q-bar-label">Outros</div><div class="q-bar-wrap"><div class="q-bar-fill" style="width:66.7%;background:var(--gold);box-shadow:0 0 8px var(--gold-glow)"></div></div><div class="q-bar-val" style="color:var(--gold)">66,7%</div></div>
+        <div class="q-bar-row"><div class="q-bar-label">Parque Dreams</div><div class="q-bar-wrap"><div class="q-bar-fill" style="width:63.2%;background:var(--orange);box-shadow:0 0 8px var(--orange-glow)"></div></div><div class="q-bar-val" style="color:var(--orange)">63,2%</div></div>
+        <div class="q-bar-row"><div class="q-bar-label">Baden Baden</div><div class="q-bar-wrap"><div class="q-bar-fill" style="width:61.9%;background:var(--bordeaux3);box-shadow:0 0 8px var(--glow)"></div></div><div class="q-bar-val" style="color:var(--bordeaux3)">61,9%</div></div>
+        <div class="q-bar-row"><div class="q-bar-label">Frente Sala</div><div class="q-bar-wrap"><div class="q-bar-fill" style="width:61.3%;background:var(--bordeaux3);box-shadow:0 0 8px var(--glow)"></div></div><div class="q-bar-val" style="color:var(--bordeaux3)">61,3%</div></div>
       </div>
     </div>
 
     <!-- GEOGRAFIA -->
-    <div class="section-title">⬡ DISTRIBUIÇÃO GEOGRÁFICA</div>
+    <div class="section-title"><span class="pulse-ring"></span>DISTRIBUIÇÃO GEOGRÁFICA</div>
     <div class="grid-2">
       <div class="card">
-        <h3>Top Estados</h3>
+        <h3>Visitantes por Estado</h3>
+        <div class="chart-wrap" style="height:270px">
+          <canvas id="chartGeo"></canvas>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Top Estados — Volume & Qualificação</h3>
         <table>
           <thead><tr><th>UF</th><th>Visitantes</th><th>% Total</th><th>% Q</th></tr></thead>
           <tbody>
-            <tr><td><strong style="color:var(--red)">SP</strong></td><td>67</td><td>55,8%</td><td><span class="tag q">67,2%</span></td></tr>
+            <tr><td><strong style="color:var(--bordeaux3)">SP</strong></td><td>67</td><td>55,8%</td><td><span class="tag q">67,2%</span></td></tr>
             <tr><td><strong>MG</strong></td><td>14</td><td>11,7%</td><td><span class="tag warn">57,1%</span></td></tr>
             <tr><td><strong>RJ</strong></td><td>10</td><td>8,3%</td><td><span class="tag warn">60,0%</span></td></tr>
             <tr><td><strong>PR</strong></td><td>3</td><td>2,5%</td><td><span class="tag q">66,7%</span></td></tr>
@@ -813,166 +870,621 @@
           </tbody>
         </table>
       </div>
-      <div class="card">
-        <h3>Concentração por Estado</h3>
-        <div class="chart-wrap" style="height:250px">
-          <canvas id="chartGeo"></canvas>
-        </div>
-      </div>
     </div>
 
     <!-- RENDA -->
-    <div class="section-title">⬡ PERFIL DE RENDA</div>
+    <div class="section-title"><span class="pulse-ring"></span>PERFIL DE RENDA</div>
     <div class="grid-2">
       <div class="card">
-        <h3>Qualificação por Faixa de Renda</h3>
-        <div class="chart-wrap" style="height:220px">
+        <h3>Q × NQ por Faixa de Renda</h3>
+        <div class="chart-wrap" style="height:240px">
           <canvas id="chartRenda"></canvas>
         </div>
       </div>
       <div class="card">
-        <h3>Leitura por Faixa</h3>
+        <h3>Qualificação por Faixa</h3>
         <table>
-          <thead><tr><th>Faixa</th><th>Total</th><th>Q</th><th>NQ</th><th>% Q</th></tr></thead>
+          <thead><tr><th>Faixa de Renda</th><th>Total</th><th>Q</th><th>NQ</th><th>% Q</th></tr></thead>
           <tbody>
             <tr><td>Até R$ 12k</td><td>22</td><td>9</td><td>13</td><td><span class="tag nq">40,9%</span></td></tr>
-            <tr><td>R$ 13k–15k</td><td>46</td><td>27</td><td>19</td><td><span class="tag warn">58,7%</span></td></tr>
-            <tr><td>R$ 18k–25k</td><td>18</td><td>13</td><td>5</td><td><span class="tag q">72,2%</span></td></tr>
-            <tr><td>R$ 30k–50k</td><td>25</td><td>21</td><td>4</td><td><span class="tag q">84,0%</span></td></tr>
+            <tr><td>R$ 13k – 15k</td><td>46</td><td>27</td><td>19</td><td><span class="tag warn">58,7%</span></td></tr>
+            <tr><td>R$ 18k – 25k</td><td>18</td><td>13</td><td>5</td><td><span class="tag q">72,2%</span></td></tr>
+            <tr><td>R$ 30k – 50k</td><td>25</td><td>21</td><td>4</td><td><span class="tag q">84,0%</span></td></tr>
             <tr><td>R$ 100k+</td><td>2</td><td>2</td><td>0</td><td><span class="tag q">100%</span></td></tr>
           </tbody>
         </table>
         <hr class="divider">
-        <p style="font-size:11px;color:var(--text-dim);line-height:1.7">Correlação positiva entre renda e qualificação. Faixas &lt; R$12k: 59,1% NQ — maior desalinhamento com o perfil do produto.</p>
+        <p style="font-size:11px;color:var(--text-dim);line-height:1.7">Correlação positiva entre renda e qualificação. Faixa &lt;R$12k: 59,1% NQ — maior desalinhamento com o perfil do produto.</p>
       </div>
     </div>
 
     <!-- INSIGHTS -->
-    <div class="section-title">⬡ LEITURAS ESTRATÉGICAS</div>
+    <div class="section-title"><span class="pulse-ring"></span>LEITURAS ESTRATÉGICAS</div>
     <ul class="insight-list">
-      <li class="red"><strong>🚨 Base 100% NoTour / R$ 0,00 de receita.</strong> Esta base registra apenas visitantes que não realizaram o tour. O destino dessas 120 pessoas no funil precisa ser rastreado para mensurar custo real de captação sem retorno.</li>
-      <li class="orange"><strong>⚠️ 34,2% NQ — 1 em cada 3 visitantes fora do perfil.</strong> Custo operacional sem retorno potencial direto. Requer revisão de critérios de captação em Parque Dreams e Frente da Sala.</li>
-      <li class="blue"><strong>📊 Pontos de captação qualificada.</strong> Agendamento, Dream House e Praça entregam 100% de Q. Escalar esses canais pode melhorar drasticamente a eficiência do funil.</li>
-      <li class="green"><strong>✅ SP concentra 55,8% da base.</strong> Foco geográfico já estabelecido. MG e RJ representam 20% — potencial de aprofundamento regional.</li>
-      <li class="red"><strong>🔴 Faixas de renda baixa com alta taxa NQ.</strong> Renda até R$12k → 59,1% NQ. Revisão do critério de qualificação de renda no momento da captação pode reduzir desperdício.</li>
+      <li class="red"><strong style="color:#ff4060">🚨 Base 100% NoTour — R$ 0,00 de receita registrada.</strong> Esta base contempla exclusivamente visitantes que não realizaram o tour. O custo de captação dessas 120 pessoas precisa ser cruzado com dados do funil completo para mensuração real de retorno.</li>
+      <li class="orange"><strong style="color:var(--orange)">⚠️ 34,2% de NQ — 1 em cada 3 visitantes fora do perfil.</strong> Custo operacional sem retorno potencial direto. Revisar critérios de abordagem em Parque Dreams e Frente da Sala é ação prioritária.</li>
+      <li class="cyan"><strong style="color:var(--cyan)">◎ Pontos de captação premium.</strong> Agendamento, Dream House e Praça entregam 100% de qualificação. Escalar esses canais pode transformar a eficiência do funil sem aumentar o custo de triagem.</li>
+      <li class="green"><strong style="color:var(--green)">✅ SP concentra 55,8% da base com 67,2% de Q.</strong> Foco geográfico consolidado. MG + RJ somam 20% — potencial de aprofundamento regional com abordagem segmentada.</li>
+      <li class="red"><strong style="color:#ff4060">🔴 Renda abaixo de R$12k: 59,1% NQ.</strong> Maior desalinhamento de perfil. Ajuste do critério de qualificação de renda no momento da captação pode reduzir significativamente o desperdício operacional.</li>
     </ul>
 
     <!-- AUDITORIA -->
-    <div class="section-title">⬡ AUDITORIA DA BASE</div>
+    <div class="section-title"><span class="pulse-ring"></span>AUDITORIA DA BASE</div>
     <div class="audit-box">
-      <strong>Registros brutos:</strong> 120 &nbsp;|&nbsp;
-      <strong>Duplicatas removidas:</strong> 0 &nbsp;|&nbsp;
+      <strong>Registros brutos:</strong> 120 &nbsp;·&nbsp;
+      <strong>Duplicatas removidas:</strong> 0 &nbsp;·&nbsp;
       <strong>Base válida:</strong> 120 registros<br>
-      <strong>Critério:</strong> Verificação por Nome 1 + Data — nenhuma duplicata detectada.<br>
-      <strong>Observação:</strong> Status = NoTour (100%). Valor vendido = R$ 0,00 em todos os registros.<br>
-      <strong>VGV e % Cancelamento:</strong> Não calculáveis nesta base — ausência de vendas registradas. Indicadores ficarão disponíveis quando dados de Tour/Venda forem adicionados.
+      <strong>Critério de deduplicação:</strong> Nome 1 + Data de atendimento — nenhuma duplicata detectada.<br>
+      <strong>Status:</strong> 100% NoTour. Valor vendido = R$ 0,00 em todos os registros.<br>
+      <strong>VGV e % Cancelamento:</strong> Não calculáveis nesta base — ausência total de vendas registradas. Serão ativados quando dados de Tour/Venda forem incluídos.
     </div>
 
   </div><!-- /view-geral -->
 
-  <!-- ===================== VIEW: PROMOTORES ===================== -->
+  <!-- ══════════════════════════════════════════
+       VIEW: PROMOTORES
+  ══════════════════════════════════════════ -->
   <div class="view-panel" id="view-promotores">
-    <div class="section-title">⬡ VISÃO INDIVIDUAL — PROMOTORES DE MARKETING</div>
 
-    <!-- RANKING GERAL -->
+    <div class="section-title"><span class="pulse-ring"></span>VISÃO GERAL — PROMOTORES DE MARKETING</div>
     <div class="grid-2">
       <div class="card">
-        <h3>Ranking — Volume Captado</h3>
-        <div class="chart-wrap" style="height:260px">
+        <h3>Ranking por Volume Captado</h3>
+        <div class="chart-wrap" style="height:290px">
           <canvas id="chartPromoVol"></canvas>
         </div>
       </div>
       <div class="card">
-        <h3>Ranking — Eficiência de Qualificação (%Q)</h3>
-        <div class="chart-wrap" style="height:260px">
+        <h3>Ranking por Eficiência de Qualificação (%Q)</h3>
+        <div class="chart-wrap" style="height:290px">
           <canvas id="chartPromoQ"></canvas>
         </div>
       </div>
     </div>
 
-    <!-- SELECTOR -->
-    <div class="section-title">⬡ PERFIL INDIVIDUAL</div>
+    <!-- TABELA PROMOTORES -->
+    <div class="card" style="margin-top:14px">
+      <h3>Visão Consolidada — Todos os Promotores (Top 8)</h3>
+      <table>
+        <thead><tr><th>Promotor</th><th>Total Captado</th><th>Qualificados</th><th>Não Qualif.</th><th>% Q</th><th>VGV</th><th>% Cancelamento</th><th>Eficiência</th></tr></thead>
+        <tbody id="tabelaPromotores"></tbody>
+      </table>
+    </div>
+
+    <div class="section-title"><span class="pulse-ring"></span>PERFIL INDIVIDUAL</div>
     <div class="role-label">Selecione o promotor:</div>
     <div class="individual-selector" id="selectorPromotor"></div>
     <div id="perfilPromotor"></div>
 
   </div><!-- /view-promotores -->
 
-  <!-- ===================== VIEW: LINERS ===================== -->
+  <!-- ══════════════════════════════════════════
+       VIEW: LINERS
+  ══════════════════════════════════════════ -->
   <div class="view-panel" id="view-liners">
-    <div class="section-title">⬡ VISÃO INDIVIDUAL — CONSULTORES (LINERS)</div>
 
+    <div class="section-title"><span class="pulse-ring"></span>VISÃO GERAL — CONSULTORES (LINERS)</div>
     <div class="grid-2">
       <div class="card">
-        <h3>Ranking — Volume Atendido</h3>
-        <div class="chart-wrap" style="height:260px">
+        <h3>Ranking por Volume Atendido</h3>
+        <div class="chart-wrap" style="height:290px">
           <canvas id="chartLinerVol"></canvas>
         </div>
       </div>
       <div class="card">
-        <h3>Ranking — Eficiência de Qualificação (%Q)</h3>
-        <div class="chart-wrap" style="height:260px">
+        <h3>Ranking por Eficiência de Qualificação (%Q)</h3>
+        <div class="chart-wrap" style="height:290px">
           <canvas id="chartLinerQ"></canvas>
         </div>
       </div>
     </div>
 
-    <div class="section-title">⬡ PERFIL INDIVIDUAL</div>
+    <!-- TABELA LINERS -->
+    <div class="card" style="margin-top:14px">
+      <h3>Visão Consolidada — Todos os Consultores (Top 8)</h3>
+      <table>
+        <thead><tr><th>Consultor</th><th>Total Atendido</th><th>Qualificados</th><th>Não Qualif.</th><th>% Q</th><th>VGV</th><th>% Cancelamento</th><th>Eficiência</th></tr></thead>
+        <tbody id="tabelaLiners"></tbody>
+      </table>
+    </div>
+
+    <div class="section-title"><span class="pulse-ring"></span>PERFIL INDIVIDUAL</div>
     <div class="role-label">Selecione o consultor:</div>
     <div class="individual-selector" id="selectorLiner"></div>
     <div id="perfilLiner"></div>
 
   </div><!-- /view-liners -->
 
-  <!-- ===================== VIEW: CLOSERS ===================== -->
+  <!-- ══════════════════════════════════════════
+       VIEW: CLOSERS
+  ══════════════════════════════════════════ -->
   <div class="view-panel" id="view-closers">
-    <div class="section-title">⬡ CLOSERS</div>
+    <div class="section-title"><span class="pulse-ring"></span>CLOSERS</div>
     <div class="card">
       <div class="no-data">
-        <span>◎</span>
+        <span class="nd-icon">◎</span>
         DADOS DE CLOSER NÃO DISPONÍVEIS NA BASE ATUAL<br>
-        <span style="font-size:10px;margin-top:8px;display:block;color:var(--text-dim)">
+        <span style="font-size:10px;margin-top:10px;display:block;color:var(--text-dim);line-height:2">
           A base recebida não contém coluna de Closer atribuído por atendimento.<br>
           Esta seção será ativada automaticamente quando os dados forem fornecidos.
         </span>
       </div>
     </div>
-  </div><!-- /view-closers -->
+  </div>
 
 </div><!-- /container -->
 
 <div class="footer">
-  DASHBOARD GERADO AUTOMATICAMENTE &nbsp;|&nbsp; <span>CONTROLE DE SALA 2026</span> &nbsp;|&nbsp; BASE: 120 REGISTROS &nbsp;|&nbsp; NOTOUR
+  <span>CONTROLE DE SALA 2026</span> &nbsp;·&nbsp; BASE: 120 REGISTROS &nbsp;·&nbsp; NOTOUR &nbsp;·&nbsp; DASHBOARD EXECUTIVO
 </div>
 
-<!-- ===================== SCRIPTS ===================== -->
+<!-- ══════════════════════════════════════════
+     SCRIPTS
+══════════════════════════════════════════ -->
 <script>
-// ======= DADOS BASE =======
+// ── DADOS ──
 const dadosPromotor = [
-  { nome: "Raphael Bueno",         total: 18, q: 11, nq: 7  },
-  { nome: "Francisco A. Rodrigues",total: 16, q: 12, nq: 4  },
-  { nome: "Josyene Freitas",       total: 10, q: 8,  nq: 2  },
-  { nome: "Matheus Esley Silva",   total: 10, q: 5,  nq: 5  },
-  { nome: "Larissa Ribeiro",       total: 7,  q: 4,  nq: 3  },
-  { nome: "Suene Cintia",          total: 5,  q: 4,  nq: 1  },
-  { nome: "Pedro H. Gomes",        total: 5,  q: 3,  nq: 2  },
-  { nome: "Luan S. Firmino",       total: 4,  q: 3,  nq: 1  },
-  { nome: "Demais (20)",           total: 45, q: 29, nq: 16 }
+  { nome:"Raphael Bueno",          total:18, q:11, nq:7  },
+  { nome:"Francisco A. Rodrigues", total:16, q:12, nq:4  },
+  { nome:"Josyene Freitas",        total:10, q:8,  nq:2  },
+  { nome:"Matheus Esley Silva",    total:10, q:5,  nq:5  },
+  { nome:"Larissa Ribeiro",        total:7,  q:4,  nq:3  },
+  { nome:"Suene Cintia",           total:5,  q:4,  nq:1  },
+  { nome:"Pedro H. Gomes",         total:5,  q:3,  nq:2  },
+  { nome:"Luan S. Firmino",        total:4,  q:3,  nq:1  }
 ];
 
 const dadosLiner = [
-  { nome: "Renata Dorado",        total: 28, q: 20, nq: 8  },
-  { nome: "Bianca Duarte",        total: 11, q: 6,  nq: 5  },
-  { nome: "Karina F. Nascimento", total: 8,  q: 5,  nq: 3  },
-  { nome: "Amanda Dorado",        total: 8,  q: 5,  nq: 3  },
-  { nome: "Ramon S. Pinheiro",    total: 7,  q: 6,  nq: 1  },
-  { nome: "Guilherme S. Batista", total: 7,  q: 4,  nq: 3  },
-  { nome: "Silvia Regina",        total: 7,  q: 5,  nq: 2  },
-  { nome: "Stella Christy Dias",  total: 6,  q: 3,  nq: 3  },
-  { nome: "Demais (14)",          total: 38, q: 25, nq: 13 }
+  { nome:"Renata Dorado",         total:28, q:20, nq:8  },
+  { nome:"Bianca Duarte",         total:11, q:6,  nq:5  },
+  { nome:"Karina F. Nascimento",  total:8,  q:5,  nq:3  },
+  { nome:"Amanda Dorado",         total:8,  q:5,  nq:3  },
+  { nome:"Ramon S. Pinheiro",     total:7,  q:6,  nq:1  },
+  { nome:"Guilherme S. Batista",  total:7,  q:4,  nq:3  },
+  { nome:"Silvia Regina",         total:7,  q:5,  nq:2  },
+  { nome:"Stella Christy Dias",   total:6,  q:3,  nq:3  }
 ];
 
-const dadosMensais = {
-  meses: ["Jan","Fev","Mar","Abr","Mai","Jun*"],
-  total: [38,13,14,27,23,5],
-  q:     
+const meses   = ["Jan","Fev","Mar","Abr","Mai","Jun*"];
+const totMes  = [38,13,14,27,23,5];
+const qMes    = [25,8,11,18,14,3];
+const nqMes   = [13,5,3,9,9,2];
+
+// ── CHART DEFAULTS ──
+Chart.defaults.color = '#7a5555';
+Chart.defaults.font.family = 'Rajdhani';
+
+const BD   = '#c00020';
+const BD2  = 'rgba(192,0,32,0.55)';
+const CYAN  = '#00ffe0';
+const GOLD  = '#ffcc00';
+const PURP  = '#cc44ff';
+const GRN   = '#00ff88';
+const ORG   = '#ff6600';
+const BLU   = '#0088ff';
+
+const PALETTE = [BD,'#ff4488',CYAN,GOLD,PURP,GRN,ORG,BLU,'#ff0066','#44ffcc'];
+
+const tooltipDef = (color) => ({
+  backgroundColor:'#050000',
+  borderColor: color || BD,
+  borderWidth:1,
+  titleColor:'#fff5f5',
+  bodyColor:'#c09090',
+  padding:10
+});
+
+// ── GRÁFICO: MENSAL LINHA ──
+new Chart(document.getElementById('chartMensal'),{
+  type:'line',
+  data:{
+    labels:meses,
+    datasets:[{
+      label:'Atendimentos',
+      data:totMes,
+      borderColor:BD,
+      backgroundColor:(ctx)=>{
+        const g=ctx.chart.ctx.createLinearGradient(0,0,0,220);
+        g.addColorStop(0,'rgba(192,0,32,0.45)');
+        g.addColorStop(1,'rgba(192,0,32,0.02)');
+        return g;
+      },
+      borderWidth:2.5,
+      pointBackgroundColor:BD,
+      pointBorderColor:'#fff5f5',
+      pointRadius:6, pointHoverRadius:10,
+      tension:0.45, fill:true
+    }]
+  },
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    plugins:{legend:{display:false}, tooltip:tooltipDef(BD)},
+    scales:{
+      x:{grid:{color:'rgba(139,0,0,0.1)'}, ticks:{color:'#7a5555'}},
+      y:{grid:{color:'rgba(139,0,0,0.08)'}, ticks:{color:'#7a5555'}, beginAtZero:true}
+    }
+  }
+});
+
+// ── GRÁFICO: PIZZA Q/NQ ──
+new Chart(document.getElementById('chartQnq'),{
+  type:'doughnut',
+  data:{
+    labels:['Qualificados (Q)','Não Qualif. (NQ)'],
+    datasets:[{
+      data:[79,41],
+      backgroundColor:['rgba(0,255,136,0.7)','rgba(192,0,32,0.7)'],
+      borderColor:[GRN,BD],
+      borderWidth:2,
+      hoverOffset:10
+    }]
+  },
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    plugins:{
+      legend:{position:'bottom', labels:{color:'#c09090', padding:18, font:{size:12}}},
+      tooltip:tooltipDef(GRN)
+    },
+    cutout:'68%'
+  }
+});
+
+// ── GRÁFICO: BARRAS EMPILHADAS MENSAL ──
+new Chart(document.getElementById('chartQnqMensal'),{
+  type:'bar',
+  data:{
+    labels:meses,
+    datasets:[
+      {label:'Q', data:qMes,  backgroundColor:'rgba(0,255,136,0.65)',  borderColor:GRN, borderWidth:1},
+      {label:'NQ',data:nqMes, backgroundColor:'rgba(192,0,32,0.65)',   borderColor:BD,  borderWidth:1}
+    ]
+  },
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    plugins:{legend:{labels:{color:'#c09090'}}, tooltip:{...tooltipDef(BD), mode:'index', intersect:false}},
+    scales:{
+      x:{stacked:true, grid:{color:'rgba(139,0,0,0.08)'}, ticks:{color:'#7a5555'}},
+      y:{stacked:true, grid:{color:'rgba(139,0,0,0.08)'}, ticks:{color:'#7a5555'}, beginAtZero:true}
+    }
+  }
+});
+
+// ── GRÁFICO: LOCAIS ──
+new Chart(document.getElementById('chartLocais'),{
+  type:'bar',
+  data:{
+    labels:['Parque Dreams','Frente Sala','Baden Baden','Outros','Esquina 1','Agendamento','Dream House','Praça'],
+    datasets:[{
+      label:'Atendimentos',
+      data:[38,31,21,15,7,4,2,2],
+      backgroundColor:[BD2,BD2,'rgba(192,0,32,0.4)','rgba(192,0,32,0.25)','rgba(255,204,0,0.6)','rgba(0,255,136,0.65)','rgba(0,255,136,0.65)','rgba(0,255,136,0.65)'],
+      borderColor:[BD,BD,BD,BD,GOLD,GRN,GRN,GRN],
+      borderWidth:1
+    }]
+  },
+  options:{
+    indexAxis:'y',
+    responsive:true, maintainAspectRatio:false,
+    plugins:{legend:{display:false}, tooltip:tooltipDef(BD)},
+    scales:{
+      x:{grid:{color:'rgba(139,0,0,0.08)'}, ticks:{color:'#7a5555'}, beginAtZero:true},
+      y:{grid:{display:false}, ticks:{color:'#f0e0e0', font:{size:11}}}
+    }
+  }
+});
+
+// ── GRÁFICO: GEO ──
+new Chart(document.getElementById('chartGeo'),{
+  type:'bar',
+  data:{
+    labels:['SP','MG','RJ','PR','PE','BA','MT','PA','CE','Outros'],
+    datasets:[{
+      label:'Visitantes',
+      data:[67,14,10,3,3,3,3,2,2,13],
+      backgroundColor:(ctx)=>{
+        const palette=['rgba(192,0,32,0.85)','rgba(192,0,32,0.65)','rgba(192,0,32,0.5)','rgba(255,204,0,0.55)','rgba(255,204,0,0.55)','rgba(255,204,0,0.55)','rgba(255,204,0,0.55)','rgba(0,255,136,0.5)','rgba(0,255,136,0.5)','rgba(100,100,120,0.4)'];
+        return palette[ctx.dataIndex];
+      },
+      borderColor:(ctx)=>{
+        const bc=[BD,BD,BD,GOLD,GOLD,GOLD,GOLD,GRN,GRN,'#555'];
+        return bc[ctx.dataIndex];
+      },
+      borderWidth:1
+    }]
+  },
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    plugins:{legend:{display:false}, tooltip:tooltipDef(BD)},
+    scales:{
+      x:{grid:{color:'rgba(139,0,0,0.08)'}, ticks:{color:'#7a5555'}},
+      y:{grid:{color:'rgba(139,0,0,0.08)'}, ticks:{color:'#7a5555'}, beginAtZero:true}
+    }
+  }
+});
+
+// ── GRÁFICO: RENDA ──
+new Chart(document.getElementById('chartRenda'),{
+  type:'bar',
+  data:{
+    labels:['Até R$12k','R$13–15k','R$18–25k','R$30–50k','R$100k+'],
+    datasets:[
+      {label:'Q',  data:[9,27,13,21,2],  backgroundColor:'rgba(0,255,136,0.65)',  borderColor:GRN, borderWidth:1},
+      {label:'NQ', data:[13,19,5,4,0],   backgroundColor:'rgba(192,0,32,0.65)',   borderColor:BD,  borderWidth:1}
+    ]
+  },
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    plugins:{legend:{labels:{color:'#c09090'}}, tooltip:{...tooltipDef(BD), mode:'index', intersect:false}},
+    scales:{
+      x:{stacked:true, grid:{color:'rgba(139,0,0,0.08)'}, ticks:{color:'#7a5555'}},
+      y:{stacked:true, grid:{color:'rgba(139,0,0,0.08)'}, ticks:{color:'#7a5555'}, beginAtZero:true}
+    }
+  }
+});
+
+// ── GRÁFICO: PROMOTOR VOLUME ──
+new Chart(document.getElementById('chartPromoVol'),{
+  type:'bar',
+  data:{
+    labels:dadosPromotor.map(d=>d.nome),
+    datasets:[{
+      label:'Total Captado',
+      data:dadosPromotor.map(d=>d.total),
+      backgroundColor:dadosPromotor.map((_,i)=>PALETTE[i]+'99'),
+      borderColor:dadosPromotor.map((_,i)=>PALETTE[i]),
+      borderWidth:1
+    }]
+  },
+  options:{
+    indexAxis:'y',
+    responsive:true, maintainAspectRatio:false,
+    plugins:{legend:{display:false}, tooltip:tooltipDef(BD)},
+    scales:{
+      x:{grid:{color:'rgba(139,0,0,0.08)'}, ticks:{color:'#7a5555'}, beginAtZero:true},
+      y:{grid:{display:false}, ticks:{color:'#f0e0e0', font:{size:10}}}
+    }
+  }
+});
+
+// ── GRÁFICO: PROMOTOR %Q ──
+new Chart(document.getElementById('chartPromoQ'),{
+  type:'bar',
+  data:{
+    labels:dadosPromotor.map(d=>d.nome),
+    datasets:[{
+      label:'% Q',
+      data:dadosPromotor.map(d=>Math.round(d.q/d.total*100)),
+      backgroundColor:dadosPromotor.map(d=>{
+        const p=d.q/d.total*100;
+        if(p>=75)return'rgba(0,255,136,0.65)';
+        if(p>=60)return'rgba(255,204,0,0.65)';
+        return'rgba(192,0,32,0.65)';
+      }),
+      borderColor:dadosPromotor.map(d=>{
+        const p=d.q/d.total*100;
+        if(p>=75)return GRN; if(p>=60)return GOLD; return BD;
+      }),
+      borderWidth:1
+    }]
+  },
+  options:{
+    indexAxis:'y',
+    responsive:true, maintainAspectRatio:false,
+    plugins:{legend:{display:false}, tooltip:{...tooltipDef(GRN), callbacks:{label:ctx=>` ${ctx.raw}% qualificados`}}},
+    scales:{
+      x:{grid:{color:'rgba(139,0,0,0.08)'}, ticks:{color:'#7a5555', callback:v=>v+'%'}, beginAtZero:true, max:100},
+      y:{grid:{display:false}, ticks:{color:'#f0e0e0', font:{size:10}}}
+    }
+  }
+});
+
+// ── GRÁFICO: LINER VOLUME ──
+new Chart(document.getElementById('chartLinerVol'),{
+  type:'bar',
+  data:{
+    labels:dadosLiner.map(d=>d.nome),
+    datasets:[{
+      label:'Total Atendido',
+      data:dadosLiner.map(d=>d.total),
+      backgroundColor:dadosLiner.map((_,i)=>PALETTE[i]+'99'),
+      borderColor:dadosLiner.map((_,i)=>PALETTE[i]),
+      borderWidth:1
+    }]
+  },
+  options:{
+    indexAxis:'y',
+    responsive:true, maintainAspectRatio:false,
+    plugins:{legend:{display:false}, tooltip:tooltipDef(CYAN)},
+    scales:{
+      x:{grid:{color:'rgba(139,0,0,0.08)'}, ticks:{color:'#7a5555'}, beginAtZero:true},
+      y:{grid:{display:false}, ticks:{color:'#f0e0e0', font:{size:10}}}
+    }
+  }
+});
+
+// ── GRÁFICO: LINER %Q ──
+new Chart(document.getElementById('chartLinerQ'),{
+  type:'bar',
+  data:{
+    labels:dadosLiner.map(d=>d.nome),
+    datasets:[{
+      label:'% Q',
+      data:dadosLiner.map(d=>Math.round(d.q/d.total*100)),
+      backgroundColor:dadosLiner.map(d=>{
+        const p=d.q/d.total*100;
+        if(p>=75)return'rgba(0,255,136,0.65)'; if(p>=60)return'rgba(255,204,0,0.65)'; return'rgba(192,0,32,0.65)';
+      }),
+      borderColor:dadosLiner.map(d=>{const p=d.q/d.total*100; if(p>=75)return GRN; if(p>=60)return GOLD; return BD;}),
+      borderWidth:1
+    }]
+  },
+  options:{
+    indexAxis:'y',
+    responsive:true, maintainAspectRatio:false,
+    plugins:{legend:{display:false}, tooltip:{...tooltipDef(CYAN), callbacks:{label:ctx=>` ${ctx.raw}% qualificados`}}},
+    scales:{
+      x:{grid:{color:'rgba(139,0,0,0.08)'}, ticks:{color:'#7a5555', callback:v=>v+'%'}, beginAtZero:true, max:100},
+      y:{grid:{display:false}, ticks:{color:'#f0e0e0', font:{size:10}}}
+    }
+  }
+});
+
+// ── TABELAS CONSOLIDADAS ──
+function tagEff(p){
+  if(p>=75)return`<span class="tag q">BOA</span>`;
+  if(p>=60)return`<span class="tag warn">MODERADA</span>`;
+  return`<span class="tag nq">BAIXA</span>`;
+}
+function pctTag(p){
+  if(p>=75)return`<span class="tag q">${p}%</span>`;
+  if(p>=60)return`<span class="tag warn">${p}%</span>`;
+  return`<span class="tag nq">${p}%</span>`;
+}
+
+const tbP = document.getElementById('tabelaPromotores');
+dadosPromotor.forEach(d=>{
+  const p=Math.round(d.q/d.total*100);
+  tbP.innerHTML+=`<tr>
+    <td><strong>${d.nome}</strong></td>
+    <td>${d.total}</td>
+    <td style="color:var(--green)">${d.q}</td>
+    <td style="color:#ff4060">${d.nq}</td>
+    <td>${pctTag(p)}</td>
+    <td style="color:var(--text-dim)">R$ 0,00</td>
+    <td><span class="tag info">N/D</span></td>
+    <td>${tagEff(p)}</td>
+  </tr>`;
+});
+
+const tbL = document.getElementById('tabelaLiners');
+dadosLiner.forEach(d=>{
+  const p=Math.round(d.q/d.total*100);
+  tbL.innerHTML+=`<tr>
+    <td><strong>${d.nome}</strong></td>
+    <td>${d.total}</td>
+    <td style="color:var(--green)">${d.q}</td>
+    <td style="color:#ff4060">${d.nq}</td>
+    <td>${pctTag(p)}</td>
+    <td style="color:var(--text-dim)">R$ 0,00</td>
+    <td><span class="tag info">N/D</span></td>
+    <td>${tagEff(p)}</td>
+  </tr>`;
+});
+
+// ── PERFIS INDIVIDUAIS ──
+function renderPerfil(d, role, containerId){
+  const p=Math.round(d.q/d.total*100);
+  const cor = p>=75?'var(--green)':p>=60?'var(--gold)':'#ff4060';
+  const ptag= p>=75?'q':p>=60?'warn':'nq';
+  const label= p>=75?'BOA':p>=60?'MODERADA':'BAIXA';
+  document.getElementById(containerId).innerHTML=`
+  <div class="profile-card" style="margin-top:14px">
+    <div class="profile-name">${d.nome}</div>
+    <div class="profile-role">${role}</div>
+    <div class="profile-metrics">
+      <div class="profile-metric">
+        <span class="pm-val">${d.total}</span>
+        <div class="pm-label">Atendimentos</div>
+      </div>
+      <div class="profile-metric">
+        <span class="pm-val" style="color:var(--green);text-shadow:0 0 12px var(--green-glow)">${d.q}</span>
+        <div class="pm-label">Qualificados</div>
+      </div>
+      <div class="profile-metric">
+        <span class="pm-val" style="color:#ff4060;text-shadow:0 0 12px rgba(255,64,96,0.5)">${d.nq}</span>
+        <div class="pm-label">Não Qualif.</div>
+      </div>
+      <div class="profile-metric">
+        <span class="pm-val" style="color:${cor};text-shadow:0 0 12px ${cor}">${p}%</span>
+        <div class="pm-label">Eficiência Q</div>
+      </div>
+      <div class="profile-metric">
+        <span class="pm-val" style="color:var(--text-dim)">R$ 0</span>
+        <div class="pm-label">VGV</div>
+      </div>
+      <div class="profile-metric">
+        <span class="pm-val" style="color:var(--text-dim)">N/D</span>
+        <div class="pm-label">% Cancel.</div>
+      </div>
+    </div>
+    <div class="eff-meter">
+      <div class="eff-label">Taxa de Qualificação</div>
+      <div class="eff-track">
+        <div class="eff-fill" style="width:${p}%;background:${cor};box-shadow:0 0 8px ${cor}"></div>
+      </div>
+      <div class="eff-val" style="color:${cor}">${p}%</div>
+    </div>
+    <div class="eff-meter">
+      <div class="eff-label">Part. no Total (120)</div>
+      <div class="eff-track">
+        <div class="eff-fill" style="width:${Math.round(d.total/120*100)}%;background:var(--cyan);box-shadow:0 0 6px var(--cyan-glow)"></div>
+      </div>
+      <div class="eff-val" style="color:var(--cyan)">${Math.round(d.total/120*100)}%</div>
+    </div>
+    <hr class="divider">
+    <p style="font-size:11px;color:var(--text-dim);line-height:1.8">
+      <strong style="color:var(--text)">Eficiência geral:</strong> <span class="tag ${ptag}">${label}</span>
+      &nbsp;·&nbsp; VGV e % Cancelamento indisponíveis — base exclusivamente NoTour, sem registros de venda associados a este profissional.
+    </p>
+  </div>`;
+}
+
+// Seletores promotores
+const spEl = document.getElementById('selectorPromotor');
+dadosPromotor.forEach((d,i)=>{
+  const btn=document.createElement('button');
+  btn.className='ind-btn'+(i===0?' active':'');
+  btn.textContent=d.nome;
+  btn.onclick=function(){
+    document.querySelectorAll('#selectorPromotor .ind-btn').forEach(b=>b.classList.remove('active'));
+    this.classList.add('active');
+    renderPerfil(d,'Promotor de Marketing','perfilPromotor');
+  };
+  spEl.appendChild(btn);
+});
+renderPerfil(dadosPromotor[0],'Promotor de Marketing','perfilPromotor');
+
+// Seletores liners
+const slEl = document.getElementById('selectorLiner');
+dadosLiner.forEach((d,i)=>{
+  const btn=document.createElement('button');
+  btn.className='ind-btn'+(i===0?' active':'');
+  btn.textContent=d.nome;
+  btn.onclick=function(){
+    document.querySelectorAll('#selectorLiner .ind-btn').forEach(b=>b.classList.remove('active'));
+    this.classList.add('active');
+    renderPerfil(d,'Consultor / Liner','perfilLiner');
+  };
+  slEl.appendChild(btn);
+});
+renderPerfil(dadosLiner[0],'Consultor / Liner','perfilLiner');
+
+// ── NAVEGAÇÃO ──
+function trocarView(id,btn){
+  document.querySelectorAll('.view-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.view-tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('view-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ── FILTROS ──
+function aplicarFiltros(){
+  const di=document.getElementById('dtInicio').value;
+  const df=document.getElementById('dtFim').value;
+  const pr=document.getElementById('filtroPromotor').value;
+  const li=document.getElementById('filtroLiner').value;
+  const fmt=v=>v?v.split('-').reverse().join('/'):'—';
+  document.getElementById('filtroInfo').innerHTML=
+    `Exibindo: <span>${fmt(di)} → ${fmt(df)}</span> &nbsp;|&nbsp; Promotor: <span>${pr||'Todos'}</span> &nbsp;|&nbsp; Consultor: <span>${li||'Todos'}</span> &nbsp;|&nbsp; Registros: <span>120 (filtro visual — integre planilha para filtragem dinâmica)</span>`;
+}
+function resetarFiltros(){
+  document.getElementById('dtInicio').value='2026-01-01';
+  document.getElementById('dtFim').value='2026-06-09';
+  document.getElementById('filtroPromotor').value='';
+  document.getElementById('filtroLiner').value='';
+  document.getElementById('filtroInfo').innerHTML=
+    `Exibindo: <span>Todo o período</span> &nbsp;|&nbsp; Promotor: <span>Todos</span> &nbsp;|&nbsp; Consultor: <span>Todos</span> &nbsp;|&nbsp; Registros: <span>120</span>`;
+}
+</script>
+</body>
+</html>
