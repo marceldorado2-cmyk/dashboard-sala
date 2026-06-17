@@ -1,91 +1,1349 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard | Controle de Sala 2026</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&display=swap');
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Language Tutor AI 🌍</title>
+  <style>
+    /* ===== RESET & BASE ===== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  :root {
-    --red: #e94560;
-    --red-dark: #c0392b;
-    --red-glow: rgba(233,69,96,0.4);
-    --bg: #050508;
-    --bg2: #0a0a10;
-    --bg3: #0f0f18;
-    --card: #0d0d16;
-    --card2: #12121e;
-    --border: rgba(233,69,96,0.25);
-    --border-bright: rgba(233,69,96,0.7);
-    --text: #e8e8f0;
-    --text-dim: #7a7a9a;
-    --text-bright: #ffffff;
-    --green: #00ff88;
-    --green-dim: rgba(0,255,136,0.15);
-    --blue: #00b4ff;
-    --orange: #ff8c00;
-    --purple: #b060ff;
+    :root {
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
+      --secondary: #06b6d4;
+      --bg: #0f172a;
+      --surface: #1e293b;
+      --surface2: #334155;
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --error: #ef4444;
+      --radius: 12px;
+      --shadow: 0 4px 24px rgba(0,0,0,0.4);
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* ===== PANELS ===== */
+    .panel { display: none; width: 100%; height: 100vh; }
+    .panel.active { display: flex; align-items: center; justify-content: center; }
+
+    /* ===== SETTINGS ===== */
+    .settings-card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 2rem;
+      width: 100%;
+      max-width: 500px;
+      max-height: 93vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 0.7rem;
+    }
+
+    .app-title {
+      text-align: center;
+      font-size: 2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #4f46e5, #06b6d4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .app-subtitle { text-align: center; color: var(--text-muted); margin-bottom: 0.5rem; font-size: 0.95rem; }
+
+    /* Language selector cards */
+    .lang-selector {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .lang-card {
+      background: var(--surface2);
+      border: 2px solid transparent;
+      border-radius: 10px;
+      padding: 1rem;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+      user-select: none;
+    }
+
+    .lang-card:hover { border-color: var(--primary); transform: translateY(-2px); }
+    .lang-card.selected { border-color: var(--primary); background: rgba(79,70,229,0.2); }
+
+    .lang-card .flag { font-size: 2rem; display: block; margin-bottom: 0.3rem; }
+    .lang-card .lang-name { font-weight: 700; font-size: 1rem; }
+    .lang-card .lang-sub { font-size: 0.75rem; color: var(--text-muted); }
+
+    label {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-top: 0.2rem;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid #475569;
+      border-radius: 8px;
+      color: var(--text);
+      padding: 0.6rem 0.9rem;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input:focus, select:focus, textarea:focus { border-color: var(--primary); }
+    input[type="range"] { padding: 0.2rem 0; cursor: pointer; accent-color: var(--primary); }
+
+    /* Section divider */
+    .section-divider {
+      border: none;
+      border-top: 1px solid #334155;
+      margin: 0.4rem 0;
+    }
+
+    .section-title {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    /* Correction language toggle */
+    .toggle-group {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .toggle-btn {
+      flex: 1;
+      background: var(--surface2);
+      border: 2px solid transparent;
+      border-radius: 8px;
+      color: var(--text);
+      padding: 0.5rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+    }
+    .toggle-btn.active { border-color: var(--primary); background: rgba(79,70,229,0.2); color: #818cf8; }
+    .toggle-btn:hover:not(.active) { border-color: #475569; }
+
+    /* ===== BUTTONS ===== */
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), #7c3aed);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 0.85rem 1.5rem;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+      margin-top: 0.3rem;
+      letter-spacing: 0.02em;
+    }
+    .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+
+    .btn-secondary {
+      background: var(--surface2);
+      color: var(--text);
+      border: 1px solid #475569;
+      border-radius: 8px;
+      padding: 0.45rem 0.9rem;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: background 0.2s;
+      white-space: nowrap;
+    }
+    .btn-secondary:hover { background: #475569; }
+
+    .btn-icon {
+      background: var(--surface2);
+      border: none;
+      border-radius: 8px;
+      padding: 0.5rem 0.6rem;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: background 0.2s;
+      color: var(--text);
+    }
+    .btn-icon:hover { background: #475569; }
+
+    .btn-mic {
+      background: var(--primary);
+      border: none;
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      font-size: 1.3rem;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: background 0.2s, transform 0.1s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .btn-mic.recording { background: var(--error); animation: pulse 1s infinite; }
+    .btn-mic:hover { transform: scale(1.08); }
+
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.5); }
+      50% { box-shadow: 0 0 0 12px rgba(239,68,68,0); }
+    }
+
+    /* ===== CHAT LAYOUT ===== */
+    #chat-panel {
+      flex-direction: column;
+      height: 100vh;
+      width: 100%;
+      max-width: 820px;
+      margin: 0 auto;
+    }
+    #chat-panel.active { display: flex; }
+
+    .chat-header {
+      background: var(--surface);
+      padding: 0.8rem 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #334155;
+      flex-shrink: 0;
+      gap: 0.5rem;
+    }
+
+    .tutor-info { display: flex; align-items: center; gap: 0.8rem; min-width: 0; }
+
+    .avatar {
+      width: 44px; height: 44px;
+      background: linear-gradient(135deg, var(--primary), #7c3aed);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem;
+      flex-shrink: 0;
+    }
+
+    .tutor-meta h2 { font-size: 1rem; font-weight: 700; }
+    .badges { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 3px; }
+
+    .badge {
+      display: inline-block;
+      font-size: 0.68rem;
+      padding: 0.18rem 0.55rem;
+      border-radius: 999px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+    .badge-lang { background: var(--primary); color: #fff; }
+    .badge-level { background: #334155; color: var(--text-muted); }
+    .badge-topic { background: var(--secondary); color: #0f172a; }
+
+    .header-actions { display: flex; gap: 0.4rem; flex-shrink: 0; }
+
+    /* ===== MESSAGES ===== */
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      scroll-behavior: smooth;
+    }
+
+    .message {
+      display: flex;
+      gap: 0.7rem;
+      max-width: 88%;
+      animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; } }
+
+    .message.user { align-self: flex-end; flex-direction: row-reverse; }
+    .message.tutor { align-self: flex-start; }
+
+    .msg-avatar {
+      width: 34px; height: 34px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; flex-shrink: 0;
+      background: linear-gradient(135deg, var(--primary), #7c3aed);
+    }
+    .message.user .msg-avatar { background: var(--surface2); }
+
+    .msg-content { display: flex; flex-direction: column; min-width: 0; }
+
+    .msg-bubble {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 0.75rem 1rem;
+      line-height: 1.65;
+      font-size: 0.93rem;
+      word-break: break-word;
+    }
+    .message.user .msg-bubble {
+      background: linear-gradient(135deg, var(--primary), #7c3aed);
+      border-bottom-right-radius: 4px;
+    }
+    .message.tutor .msg-bubble { border-bottom-left-radius: 4px; }
+
+    /* Correction boxes */
+    .correction-box {
+      margin-top: 0.75rem;
+      padding: 0.65rem 0.9rem;
+      background: rgba(245,158,11,0.12);
+      border-left: 3px solid var(--warning);
+      border-radius: 0 6px 6px 0;
+      font-size: 0.87rem;
+    }
+    .correction-box .corr-lang-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--warning);
+      margin-bottom: 0.3rem;
+      display: block;
+    }
+    .correction-box .corr-pt { color: #fcd34d; margin-bottom: 0.4rem; }
+    .correction-box .corr-target { color: #86efac; }
+
+    .tip-box {
+      margin-top: 0.75rem;
+      padding: 0.65rem 0.9rem;
+      background: rgba(34,197,94,0.1);
+      border-left: 3px solid var(--success);
+      border-radius: 0 6px 6px 0;
+      font-size: 0.87rem;
+      color: #86efac;
+    }
+
+    .msg-meta {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-top: 0.3rem;
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+    .message.user .msg-meta { justify-content: flex-end; }
+
+    .speak-btn {
+      background: none; border: none; cursor: pointer;
+      font-size: 0.85rem; color: var(--text-muted); padding: 0;
+    }
+    .speak-btn:hover { color: var(--text); }
+
+    /* ===== STATS BAR ===== */
+    .stats-bar {
+      background: var(--surface);
+      padding: 0.35rem 1.2rem;
+      display: flex;
+      gap: 1.2rem;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      border-top: 1px solid #334155;
+      flex-shrink: 0;
+      flex-wrap: wrap;
+    }
+    .stats-bar strong { color: var(--text); }
+
+    /* ===== INPUT AREA ===== */
+    .chat-input-area {
+      background: var(--surface);
+      padding: 0.85rem 1rem;
+      border-top: 1px solid #334155;
+      flex-shrink: 0;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 0.6rem;
+      align-items: flex-end;
+      margin-bottom: 0.6rem;
+    }
+
+    textarea {
+      flex: 1;
+      resize: none;
+      border-radius: 10px;
+      font-size: 0.93rem;
+      max-height: 110px;
+      font-family: inherit;
+    }
+
+    .input-actions {
+      display: flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .send-btn {
+      margin-left: auto;
+      margin-top: 0;
+      padding: 0.55rem 1.2rem;
+      font-size: 0.9rem;
+    }
+
+    /* ===== MINI SETTINGS ===== */
+    .mini-settings {
+      position: fixed;
+      top: 65px; right: 1rem;
+      background: var(--surface);
+      border: 1px solid #334155;
+      border-radius: var(--radius);
+      padding: 1.2rem;
+      width: 250px;
+      box-shadow: var(--shadow);
+      z-index: 200;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+    .mini-settings h3 { font-size: 0.95rem; margin-bottom: 0.2rem; }
+    .mini-settings.hidden { display: none; }
+
+    /* ===== TYPING INDICATOR ===== */
+    .typing-indicator .msg-bubble {
+      display: flex; gap: 5px; align-items: center;
+      padding: 0.9rem 1rem;
+    }
+    .typing-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--text-muted);
+      animation: bounce 1.2s infinite;
+    }
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-7px); }
+    }
+
+    /* ===== SCROLLBAR ===== */
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+
+    /* ===== TOAST ===== */
+    .toast {
+      position: fixed;
+      bottom: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: var(--text);
+      padding: 0.65rem 1.3rem;
+      border-radius: 999px;
+      font-size: 0.88rem;
+      z-index: 999;
+      box-shadow: var(--shadow);
+      animation: fadeIn 0.3s ease;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 600px) {
+      .settings-card { padding: 1.2rem; margin: 0.5rem; max-height: 96vh; }
+      .lang-selector { grid-template-columns: 1fr 1fr; }
+      .input-actions { gap: 0.3rem; }
+      .btn-secondary { font-size: 0.75rem; padding: 0.4rem 0.6rem; }
+      .stats-bar { gap: 0.7rem; font-size: 0.72rem; }
+      .chat-header { padding: 0.6rem 0.8rem; }
+      .message { max-width: 94%; }
+      .mini-settings { width: calc(100vw - 2rem); right: 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ===================== SETTINGS PANEL ===================== -->
+<div id="settings-panel" class="panel active">
+  <div class="card settings-card">
+    <div class="app-title">🌍 Language Tutor AI</div>
+    <p class="app-subtitle">Seu tutor pessoal de idiomas com IA</p>
+
+    <!-- API KEY -->
+    <p class="section-title">🔑 Configuração</p>
+    <label>OpenAI API Key</label>
+    <input type="password" id="api-key" placeholder="sk-..." />
+
+    <hr class="section-divider"/>
+
+    <!-- LANGUAGE SELECTION -->
+    <p class="section-title">🌐 Idioma que deseja aprender</p>
+    <div class="lang-selector">
+      <div class="lang-card selected" data-lang="english" onclick="selectLanguage(this)">
+        <span class="flag">🇺🇸</span>
+        <div class="lang-name">English</div>
+        <div class="lang-sub">Inglês Americano</div>
+      </div>
+      <div class="lang-card" data-lang="italian" onclick="selectLanguage(this)">
+        <span class="flag">🇮🇹</span>
+        <div class="lang-name">Italiano</div>
+        <div class="lang-sub">Italiano Padrão</div>
+      </div>
+    </div>
+
+    <hr class="section-divider"/>
+
+    <!-- TUTOR -->
+    <p class="section-title">🧑‍🏫 Seu Tutor</p>
+    <label>Nome do tutor</label>
+    <input type="text" id="tutor-name" placeholder="Ex: Sarah / Marco" value="Sarah" />
+
+    <label>Personalidade do tutor</label>
+    <select id="tutor-personality">
+      <option value="friendly">😊 Amigável e descontraído</option>
+      <option value="formal">👔 Formal e profissional</option>
+      <option value="funny">😄 Divertido e bem-humorado</option>
+      <option value="strict">📚 Rigoroso e detalhado</option>
+    </select>
+
+    <hr class="section-divider"/>
+
+    <!-- LEVEL & TOPIC -->
+    <p class="section-title">📚 Nível & Tópico</p>
+    <label>Seu nível</label>
+    <select id="english-level">
+      <option value="beginner">🟢 Iniciante (A1/A2)</option>
+      <option value="intermediate" selected>🟡 Intermediário (B1/B2)</option>
+      <option value="advanced">🔴 Avançado (C1/C2)</option>
+    </select>
+
+    <label>Tópico de conversa</label>
+    <select id="conversation-topic">
+      <option value="free">💬 Conversa Livre</option>
+      <option value="travel">✈️ Viagens e Turismo</option>
+      <option value="business">💼 Inglês de Negócios</option>
+      <option value="daily">🏠 Vida Cotidiana</option>
+      <option value="interview">🎯 Entrevista de Emprego</option>
+      <option value="movies">🎬 Filmes e Séries</option>
+      <option value="technology">💻 Tecnologia</option>
+      <option value="food">🍕 Gastronomia e Culinária</option>
+      <option value="culture">🎭 Cultura e Tradições</option>
+    </select>
+
+    <hr class="section-divider"/>
+
+    <!-- CORRECTION SETTINGS -->
+    <p class="section-title">✏️ Correções</p>
+    <label>Estilo de correção</label>
+    <select id="correction-style">
+      <option value="always">🔍 Corrigir sempre</option>
+      <option value="gentle">💡 Só erros graves</option>
+      <option value="end">📝 Resumo ao final</option>
+      <option value="never">🚫 Não corrigir (só conversar)</option>
+    </select>
+
+    <label>Idioma das correções</label>
+    <div class="toggle-group" id="correction-lang-toggle">
+      <button class="toggle-btn active" data-val="both" onclick="setCorrLang(this)">🌐 Ambos (PT + idioma)</button>
+      <button class="toggle-btn" data-val="pt" onclick="setCorrLang(this)">🇧🇷 Só Português</button>
+      <button class="toggle-btn" data-val="target" onclick="setCorrLang(this)">🎯 Só no idioma</button>
+    </div>
+
+    <hr class="section-divider"/>
+
+    <!-- VOICE SETTINGS -->
+    <p class="section-title">🔊 Voz do Tutor</p>
+    <label>Voz</label>
+    <select id="voice-select"></select>
+
+    <label>Velocidade da fala: <span id="rate-value">1.0</span>x</label>
+    <input type="range" id="speech-rate" min="0.5" max="1.5" step="0.1" value="1.0" />
+
+    <button class="btn-primary" onclick="startSession()">🚀 Começar a Aprender!</button>
+  </div>
+</div>
+
+<!-- ===================== CHAT PANEL ===================== -->
+<div id="chat-panel" class="panel">
+  <div class="chat-header">
+    <div class="tutor-info">
+      <div class="avatar" id="tutor-avatar">👩‍🏫</div>
+      <div class="tutor-meta">
+        <h2 id="header-tutor-name">Sarah</h2>
+        <div class="badges">
+          <span id="badge-lang" class="badge badge-lang">🇺🇸 English</span>
+          <span id="badge-level" class="badge badge-level">Intermediário</span>
+          <span id="badge-topic" class="badge badge-topic">Livre</span>
+        </div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-icon" onclick="toggleSettings()" title="Configurações rápidas">⚙️</button>
+      <button class="btn-icon" onclick="clearChat()" title="Limpar chat">🗑️</button>
+      <button class="btn-icon" onclick="exportChat()" title="Exportar conversa">📥</button>
+      <button class="btn-icon" onclick="goToSettings()" title="Voltar às configurações">🏠</button>
+    </div>
+  </div>
+
+  <div id="chat-messages" class="chat-messages"></div>
+
+  <div class="stats-bar">
+    <span>✏️ Correções: <strong id="correction-count">0</strong></span>
+    <span>💬 Mensagens: <strong id="message-count">0</strong></span>
+    <span>⏱️ Tempo: <strong id="session-time">00:00</strong></span>
+    <span>🌐 Idioma: <strong id="stat-lang">English</strong></span>
+  </div>
+
+  <div class="chat-input-area">
+    <div class="input-row">
+      <textarea id="user-input" placeholder="Digite no idioma que está aprendendo ou use o microfone..." rows="2"></textarea>
+      <button class="btn-mic" id="mic-btn" onclick="toggleMic()" title="Entrada por voz">🎤</button>
+    </div>
+    <div class="input-actions">
+      <button class="btn-secondary" onclick="requestVocabularyTip()">📖 Vocabulário</button>
+      <button class="btn-secondary" onclick="requestGrammarTip()">📝 Gramática</button>
+      <button class="btn-secondary" onclick="requestPhraseTip()">💡 Expressão</button>
+      <button class="btn-secondary" onclick="repeatLastAudio()">🔊 Repetir</button>
+      <button class="btn-primary send-btn" onclick="sendMessage()">Enviar ➤</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MINI SETTINGS ===== -->
+<div id="mini-settings" class="mini-settings hidden">
+  <h3>⚙️ Ajustes Rápidos</h3>
+  <label>Tópico</label>
+  <select id="mini-topic" onchange="updateTopic()">
+    <option value="free">💬 Conversa Livre</option>
+    <option value="travel">✈️ Viagens</option>
+    <option value="business">💼 Negócios</option>
+    <option value="daily">🏠 Vida Cotidiana</option>
+    <option value="interview">🎯 Entrevista</option>
+    <option value="movies">🎬 Filmes</option>
+    <option value="technology">💻 Tecnologia</option>
+    <option value="food">🍕 Gastronomia</option>
+    <option value="culture">🎭 Cultura</option>
+  </select>
+  <label>Correções</label>
+  <select id="mini-correction" onchange="updateCorrection()">
+    <option value="always">🔍 Sempre</option>
+    <option value="gentle">💡 Só graves</option>
+    <option value="end">📝 Resumo final</option>
+    <option value="never">🚫 Não corrigir</option>
+  </select>
+  <label>Idioma das correções</label>
+  <select id="mini-corr-lang" onchange="updateCorrLang()">
+    <option value="both">🌐 Ambos (PT + idioma)</option>
+    <option value="pt">🇧🇷 Só Português</option>
+    <option value="target">🎯 Só no idioma</option>
+  </select>
+  <label>Velocidade: <span id="mini-rate-val">1.0</span>x</label>
+  <input type="range" id="mini-rate" min="0.5" max="1.5" step="0.1" value="1.0" oninput="updateMiniRate(this)"/>
+  <button class="btn-primary" style="margin-top:0.3rem" onclick="toggleSettings()">Fechar</button>
+</div>
+
+<!-- ===================== JAVASCRIPT ===================== -->
+<script>
+// ============================================================
+//  Language Tutor AI — Lógica Principal
+// ============================================================
+
+// ---------- STATE ----------
+const state = {
+  apiKey: '',
+  tutorName: 'Sarah',
+  personality: 'friendly',
+  level: 'intermediate',
+  topic: 'free',
+  correctionStyle: 'always',
+  correctionLang: 'both',       // 'both' | 'pt' | 'target'
+  targetLanguage: 'english',    // 'english' | 'italian'
+  history: [],
+  correctionCount: 0,
+  messageCount: 0,
+  sessionStart: null,
+  timerInterval: null,
+  isRecording: false,
+  recognition: null,
+  lastSpokenText: '',
+  speechRate: 1.0,
+  selectedVoice: null,
+};
+
+// ---------- LANGUAGE CONFIG ----------
+const langConfig = {
+  english: {
+    label: '🇺🇸 English',
+    speechLang: 'en-US',
+    tutorDefaultName: 'Sarah',
+    tutorEmoji: '👩‍🏫',
+    voiceFilter: v => v.lang.startsWith('en'),
+    langLabel: 'inglês',
+  },
+  italian: {
+    label: '🇮🇹 Italiano',
+    speechLang: 'it-IT',
+    tutorDefaultName: 'Marco',
+    tutorEmoji: '👨‍🏫',
+    voiceFilter: v => v.lang.startsWith('it'),
+    langLabel: 'italiano',
+  }
+};
+
+// ---------- PERSONALITIES ----------
+const personalities = {
+  friendly: "You are warm, encouraging, and casual. Use simple language, be supportive, and occasionally use emojis.",
+  formal:   "You are professional, polite, and structured. Use formal language and precise explanations.",
+  funny:    "You are humorous and light-hearted. Use jokes, fun examples, and pop-culture references while teaching effectively.",
+  strict:   "You are thorough and detailed. Point out every mistake and provide complete grammar explanations.",
+};
+
+const levels = {
+  beginner:     "The student is a BEGINNER (A1/A2). Use very simple vocabulary and short sentences. Explain everything clearly in an accessible way.",
+  intermediate: "The student is INTERMEDIATE (B1/B2). Use natural language but explain complex words or grammar when needed.",
+  advanced:     "The student is ADVANCED (C1/C2). Speak naturally using idioms, complex structures, and nuanced vocabulary.",
+};
+
+const topics = {
+  free:        "Free conversation — discuss anything the student wants.",
+  travel:      "Travel & Tourism — destinations, tips, travel vocabulary, cultural experiences.",
+  business:    "Business language — professional communication, meetings, emails, presentations.",
+  daily:       "Daily Life — routines, household topics, shopping, food, family.",
+  interview:   "Job Interview Practice — simulate real interview questions, help craft strong answers.",
+  movies:      "Movies & TV Series — plots, characters, recommendations, related vocabulary.",
+  technology:  "Technology — gadgets, software, internet, tech trends and vocabulary.",
+  food:        "Food & Gastronomy — recipes, restaurants, culinary traditions, food vocabulary.",
+  culture:     "Culture & Traditions — history, customs, arts, festivals, and cultural nuances.",
+};
+
+const correctionStyles = {
+  always: "ALWAYS correct every grammar, vocabulary, pronunciation, or spelling mistake. Format corrections using the exact structure defined below.",
+  gentle: "Only correct significant mistakes that would confuse a native speaker. Be encouraging and gentle.",
+  end:    "At the END of each reply, add a structured correction/notes section for any errors or useful tips.",
+  never:  "Do NOT correct mistakes. Focus entirely on fluent, natural conversation.",
+};
+
+// ---------- CORRECTION LANG INSTRUCTION ----------
+function correctionLangInstruction() {
+  const langLabel = langConfig[state.targetLanguage].langLabel;
+  switch (state.correctionLang) {
+    case 'pt':
+      return `When correcting, write the correction ONLY in Brazilian Portuguese. Example:
+⚠️ Correção:
+🇧🇷 [Explicação em português do erro e a forma correta]`;
+    case 'target':
+      return `When correcting, write the correction ONLY in ${langLabel}. Example:
+⚠️ Correction:
+🎯 [Explanation in ${langLabel} of the mistake and the correct form]`;
+    case 'both':
+    default:
+      return `When correcting, ALWAYS provide the correction in BOTH languages using this exact format:
+⚠️ Correção / Correction:
+🇧🇷 [Explicação em português — explique o erro e a forma correta em PT-BR]
+🎯 [Explanation in ${langLabel} — explain the mistake and the correct form in ${langLabel}]`;
+  }
+}
+
+// ---------- BUILD SYSTEM PROMPT ----------
+function buildSystemPrompt() {
+  const cfg = langConfig[state.targetLanguage];
+  return `You are ${state.tutorName}, an expert ${cfg.label} tutor and conversation partner for a Brazilian Portuguese speaker.
+
+TEACHING LANGUAGE: You are teaching ${cfg.label}. Always respond primarily in ${cfg.label} during conversation.
+
+PERSONALITY: ${personalities[state.personality]}
+
+STUDENT LEVEL: ${levels[state.level]}
+
+TOPIC: ${topics[state.topic]}
+
+CORRECTION STYLE: ${correctionStyles[state.correctionStyle]}
+
+CORRECTION FORMAT: ${correctionLangInstruction()}
+
+IMPORTANT RULES:
+1. Always respond primarily in ${cfg.label} during the conversation itself.
+2. Keep responses conversational and engaging — not overly long.
+3. Ask follow-up questions to keep the conversation flowing.
+4. If the student writes in Portuguese instead of ${cfg.label}, gently encourage them to try in ${cfg.label}, then help them phrase it correctly.
+5. Occasionally suggest relevant vocabulary, expressions, or idioms naturally.
+6. Be supportive and confidence-building.
+7. When showing corrections, always display the CORRECT version clearly.
+8. Never mix correction language rules — follow the format exactly as instructed.`;
+}
+
+// ---------- SELECT LANGUAGE (settings screen) ----------
+function selectLanguage(card) {
+  document.querySelectorAll('.lang-card').forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
+  state.targetLanguage = card.dataset.lang;
+
+  // Suggest tutor name
+  const cfg = langConfig[state.targetLanguage];
+  document.getElementById('tutor-name').value = cfg.tutorDefaultName;
+
+  // Reload voices for that language
+  loadVoices();
+}
+
+function setCorrLang(btn) {
+  document.querySelectorAll('#correction-lang-toggle .toggle-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  state.correctionLang = btn.dataset.val;
+}
+
+// ---------- VOICES ----------
+function loadVoices() {
+  const select = document.getElementById('voice-select');
+  const cfg    = langConfig[state.targetLanguage];
+  const all    = speechSynthesis.getVoices();
+  const voices = all.filter(cfg.voiceFilter).length > 0
+                 ? all.filter(cfg.voiceFilter)
+                 : all; // fallback
+
+  select.innerHTML = '';
+  voices.forEach((v, i) => {
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = `${v.name} (${v.lang})`;
+    select.appendChild(opt);
+  });
+
+  state.selectedVoice = voices[0] || null;
+  state._voiceList    = voices;
+}
+
+speechSynthesis.onvoiceschanged = loadVoices;
+window.addEventListener('load', () => {
+  loadVoices();
+
+  document.getElementById('speech-rate').addEventListener('input', function() {
+    state.speechRate = parseFloat(this.value);
+    document.getElementById('rate-value').textContent = state.speechRate.toFixed(1);
+  });
+
+  document.getElementById('user-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+  });
+});
+
+// ---------- START SESSION ----------
+function startSession() {
+  const key = document.getElementById('api-key').value.trim();
+  if (!key) { showToast('⚠️ Insira sua OpenAI API Key para continuar.'); return; }
+
+  state.apiKey          = key;
+  state.tutorName       = document.getElementById('tutor-name').value.trim() || langConfig[state.targetLanguage].tutorDefaultName;
+  state.personality     = document.getElementById('tutor-personality').value;
+  state.level           = document.getElementById('english-level').value;
+  state.topic           = document.getElementById('conversation-topic').value;
+  state.correctionStyle = document.getElementById('correction-style').value;
+
+  const activeCorrBtn = document.querySelector('#correction-lang-toggle .toggle-btn.active');
+  state.correctionLang = activeCorrBtn ? activeCorrBtn.dataset.val : 'both';
+
+  const voiceIndex = parseInt(document.getElementById('voice-select').value) || 0;
+  state.selectedVoice = state._voiceList?.[voiceIndex] || null;
+
+  // Reset
+  state.history         = [];
+  state.correctionCount = 0;
+  state.messageCount    = 0;
+  state.sessionStart    = Date.now();
+
+  // Update header badges
+  const cfg = langConfig[state.targetLanguage];
+  document.getElementById('tutor-avatar').textContent   = cfg.tutorEmoji;
+  document.getElementById('header-tutor-name').textContent = state.tutorName;
+  document.getElementById('badge-lang').textContent     = cfg.label;
+  document.getElementById('badge-level').textContent    = capitalize(levelLabels[state.level]);
+  document.getElementById('badge-topic').textContent    = topicLabels[state.topic];
+  document.getElementById('stat-lang').textContent      = cfg.label;
+
+  // Sync mini-settings
+  document.getElementById('mini-topic').value      = state.topic;
+  document.getElementById('mini-correction').value = state.correctionStyle;
+  document.getElementById('mini-corr-lang').value  = state.correctionLang;
+  document.getElementById('mini-rate').value        = state.speechRate;
+  document.getElementById('mini-rate-val').textContent = state.speechRate.toFixed(1);
+
+  // Switch panels
+  document.getElementById('settings-panel').classList.remove('active');
+  document.getElementById('chat-panel').classList.add('active');
+
+  // Timer
+  clearInterval(state.timerInterval);
+  state.timerInterval = setInterval(updateTimer, 1000);
+
+  // Clear messages
+  document.getElementById('chat-messages').innerHTML = '';
+  updateStats();
+
+  // Greeting
+  const langLabel  = cfg.langLabel;
+  const topicLabel = topicLabels[state.topic];
+  const greeting = state.targetLanguage === 'italian'
+    ? `Ciao! Sono ${state.tutorName}, il tuo tutor di italiano! 🇮🇹 Sono qui per aiutarti a praticare e migliorare il tuo italiano. Oggi parleremo di: **${topicLabel}**. Sei pronto? Dimmi un po' di te — come ti chiami e perché vuoi imparare l'italiano?`
+    : `Hello! I'm ${state.tutorName}, your English tutor! 🇺🇸 I'm here to help you practice and improve your English. Today we'll be talking about: **${topicLabel}**. Ready to get started? Tell me a bit about yourself — what's your name and why do you want to learn English?`;
+
+  addMessage('tutor', greeting);
+  speak(greeting);
+}
+
+// ---------- SEND MESSAGE ----------
+async function sendMessage() {
+  const input = document.getElementById('user-input');
+  const text  = input.value.trim();
+  if (!text) return;
+
+  input.value = '';
+  state.messageCount++;
+  addMessage('user', text);
+  updateStats();
+
+  state.history.push({ role: 'user', content: text });
+  showTyping();
+
+  try {
+    const response = await callOpenAI();
+    removeTyping();
+    addMessage('tutor', response);
+    speak(response);
+    state.history.push({ role: 'assistant', content: response });
+
+    if (response.includes('⚠️') || response.includes('📝 Note') || response.includes('Correção')) {
+      state.correctionCount++;
+      updateStats();
+    }
+  } catch (err) {
+    removeTyping();
+    addMessage('tutor', `❌ Erro: ${err.message}. Verifique sua API Key e tente novamente.`);
+  }
+}
+
+// ---------- OPENAI ----------
+async function callOpenAI(extraMsg) {
+  const messages = [
+    { role: 'system', content: buildSystemPrompt() },
+    ...state.history,
+  ];
+  if (extraMsg) messages.push({ role: 'user', content: extraMsg });
+
+  const res = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${state.apiKey}`,
+    },
+    body: JSON.stringify({
+      model: 'gpt-4o-mini',
+      messages,
+      max_tokens: 700,
+      temperature: 0.8,
+    }),
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error?.message || `HTTP ${res.status}`);
   }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  const data = await res.json();
+  return data.choices[0].message.content;
+}
 
-  body {
-    font-family: 'Rajdhani', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    font-size: 14px;
-    min-height: 100vh;
-    background-image:
-      radial-gradient(ellipse at 20% 0%, rgba(233,69,96,0.08) 0%, transparent 50%),
-      radial-gradient(ellipse at 80% 100%, rgba(233,69,96,0.05) 0%, transparent 50%);
+// ---------- TIPS ----------
+async function requestVocabularyTip() {
+  const cfg = langConfig[state.targetLanguage];
+  showTyping();
+  try {
+    const tip = await callOpenAI(
+      `Give me a useful ${cfg.label} vocabulary tip or expression related to "${topicLabels[state.topic]}". Include: the word/expression, meaning in both Portuguese and ${cfg.langLabel}, and an example sentence in ${cfg.langLabel}.`
+    );
+    removeTyping();
+    addMessage('tutor', tip, 'tip');
+    speak(tip);
+  } catch(e) { removeTyping(); showToast('Erro ao buscar dica. Tente novamente.'); }
+}
+
+async function requestGrammarTip() {
+  const cfg = langConfig[state.targetLanguage];
+  showTyping();
+  try {
+    const tip = await callOpenAI(
+      `Give me a short, practical ${cfg.label} grammar tip for a ${state.level} student. Include a clear explanation and 2 example sentences.`
+    );
+    removeTyping();
+    addMessage('tutor', tip, 'tip');
+    speak(tip);
+  } catch(e) { removeTyping(); showToast('Erro ao buscar dica. Tente novamente.'); }
+}
+
+async function requestPhraseTip() {
+  const cfg = langConfig[state.targetLanguage];
+  showTyping();
+  try {
+    const tip = await callOpenAI(
+      `Teach me an interesting ${cfg.label} idiom or common phrase related to "${topicLabels[state.topic]}". Explain its meaning in Portuguese and show how to use it naturally in conversation.`
+    );
+    removeTyping();
+    addMessage('tutor', tip, 'tip');
+    speak(tip);
+  } catch(e) { removeTyping(); showToast('Erro ao buscar dica. Tente novamente.'); }
+}
+
+// ---------- SPEECH SYNTHESIS ----------
+function speak(text) {
+  if (!('speechSynthesis' in window)) return;
+  speechSynthesis.cancel();
+
+  const clean = text
+    .replace(/[*_#`~]/g, '')
+    .replace(/[\u{1F300}-\u{1FFFF}]/gu, '')
+    .replace(/⚠️|📝|💡|🇧🇷|🎯|🇺🇸|🇮🇹/g, '')
+    .replace(/\n+/g, ' ')
+    .trim();
+
+  // Only speak the main conversation part (before correction box)
+  const mainText = clean.split('⚠️')[0].split('Correção')[0].trim();
+
+  const utt   = new SpeechSynthesisUtterance(mainText || clean);
+  utt.voice   = state.selectedVoice;
+  utt.rate    = state.speechRate;
+  utt.lang    = langConfig[state.targetLanguage].speechLang;
+  utt.pitch   = 1;
+  state.lastSpokenText = mainText || clean;
+  speechSynthesis.speak(utt);
+}
+
+function repeatLastAudio() {
+  if (state.lastSpokenText) speak(state.lastSpokenText);
+  else showToast('Nada para repetir ainda.');
+}
+
+// ---------- SPEECH RECOGNITION ----------
+function toggleMic() {
+  if (state.isRecording) { state.recognition?.stop(); return; }
+
+  if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+    showToast('⚠️ Reconhecimento de voz não suportado. Use o Google Chrome.');
+    return;
   }
 
-  body::before {
-    content: '';
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.03) 2px,rgba(0,0,0,0.03) 4px);
-    pointer-events: none;
-    z-index: 9999;
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  state.recognition = new SR();
+  state.recognition.lang = langConfig[state.targetLanguage].speechLang;
+  state.recognition.interimResults = false;
+  state.recognition.maxAlternatives = 1;
+
+  state.recognition.onstart = () => {
+    state.isRecording = true;
+    const btn = document.getElementById('mic-btn');
+    btn.classList.add('recording');
+    btn.textContent = '⏹️';
+    showToast('🎤 Ouvindo... Fale em ' + langConfig[state.targetLanguage].label);
+  };
+
+  state.recognition.onresult = (e) => {
+    const transcript = e.results[0][0].transcript;
+    document.getElementById('user-input').value = transcript;
+  };
+
+  state.recognition.onend = () => {
+    state.isRecording = false;
+    const btn = document.getElementById('mic-btn');
+    btn.classList.remove('recording');
+    btn.textContent = '🎤';
+    if (document.getElementById('user-input').value.trim()) sendMessage();
+  };
+
+  state.recognition.onerror = (e) => {
+    console.error('Speech error:', e.error);
+    state.isRecording = false;
+    document.getElementById('mic-btn').classList.remove('recording');
+    document.getElementById('mic-btn').textContent = '🎤';
+    if (e.error !== 'no-speech') showToast('Erro no microfone: ' + e.error);
+  };
+
+  state.recognition.start();
+}
+
+// ---------- RENDER MESSAGE ----------
+function addMessage(role, rawText, type = '') {
+  const container = document.getElementById('chat-messages');
+  const wrapper   = document.createElement('div');
+  wrapper.className = `message ${role}`;
+
+  const cfg = langConfig[state.targetLanguage];
+
+  // Avatar
+  const avatarEl = document.createElement('div');
+  avatarEl.className = 'msg-avatar';
+  avatarEl.textContent = role === 'tutor' ? cfg.tutorEmoji : '🧑';
+
+  // Bubble
+  const bubble = document.createElement('div');
+  bubble.className = 'msg-bubble';
+
+  let html = parseMarkdown(rawText);
+
+  // Render bilingual correction box
+  if ((rawText.includes('⚠️') || rawText.includes('Correção')) && role === 'tutor') {
+    html = renderCorrectionBox(rawText);
   }
 
-  .header {
-    background: linear-gradient(180deg, #0a0a12 0%, #080810 100%);
-    border-bottom: 1px solid var(--border-bright);
-    padding: 24px 36px;
-    position: relative;
-    overflow: hidden;
+  if (type === 'tip') {
+    bubble.innerHTML = `<div class="tip-box">${parseMarkdown(rawText)}</div>`;
+  } else {
+    bubble.innerHTML = html;
   }
-  .header::before {
-    content: '';
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--red), transparent);
-    box-shadow: 0 0 20px var(--red-glow);
+
+  // Meta (time + speak button)
+  const meta = document.createElement('div');
+  meta.className = 'msg-meta';
+
+  const timeStr = new Date().toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
+  meta.innerHTML = `<span>${timeStr}</span>`;
+
+  if (role === 'tutor') {
+    const speakBtn = document.createElement('button');
+    speakBtn.className = 'speak-btn';
+    speakBtn.title = 'Ouvir mensagem';
+    speakBtn.textContent = '🔊';
+    speakBtn.addEventListener('click', () => speak(rawText));
+    meta.appendChild(speakBtn);
   }
-  .header::after {
-    content: '';
-    position: absolute;
-    top: -50%; left: -10%;
-    width: 120%; height: 200%;
-    background: radial-gradient(ellipse, rgba(233,69,96,0.04) 0%, transparent 60%);
-    pointer-events: none;
+
+  const content = document.createElement('div');
+  content.className = 'msg-content';
+  content.appendChild(bubble);
+  content.appendChild(meta);
+
+  wrapper.appendChild(avatarEl);
+  wrapper.appendChild(content);
+  container.appendChild(wrapper);
+  container.scrollTop = container.scrollHeight;
+}
+
+// ---------- CORRECTION BOX RENDERER ----------
+function renderCorrectionBox(text) {
+  // Split text at the correction marker
+  const corrMarkers = ['⚠️ Correção / Correction:', '⚠️ Correção:', '⚠️ Correction:', '📝 Notes:', '📝 Note:'];
+  let mainText = text;
+  let corrText = '';
+
+  for (const marker of corrMarkers) {
+    const idx = text.indexOf(marker);
+    if (idx !== -1) {
+      mainText = text.substring(0, idx).trim();
+      corrText = text.substring(idx).trim();
+      break;
+    }
   }
-  .header-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 12px;
+
+  let html = parseMarkdown(mainText);
+
+  if (corrText) {
+    // Parse bilingual correction
+    const hasPT     = corrText.includes('🇧🇷');
+    const hasTarget = corrText.includes('🎯');
+
+    let corrHtml = '<div class="correction-box">';
+
+    if (hasPT && hasTarget) {
+      const ptPart     = corrText.split('🎯')[0].replace(/⚠️.*?:\n?/, '').replace('🇧🇷', '').trim();
+      const targetPart = ('🎯' + corrText.split('🎯')[1]).replace('🎯', '').trim();
+      corrHtml += `<span class="corr-lang-label">⚠️ Correção / Correction</span>`;
+      corrHtml += `<div class="corr-pt">🇧🇷 <strong>Português:</strong> ${escapeHtml(ptPart)}</div>`;
+      corrHtml += `<div class="corr-target">🎯 <strong>${capitalize(langConfig[state.targetLanguage].langLabel)}:</strong> ${escapeHtml(targetPart)}</div>`;
+    } else if (hasPT) {
+      const ptPart = corrText.replace(/⚠️.*?:\n?/, '').replace('🇧🇷', '').trim();
+      corrHtml += `<span class="corr-lang-label">⚠️ Correção</span>`;
+      corrHtml += `<div class="corr-pt">🇧🇷 ${escapeHtml(ptPart)}</div>`;
+    } else if (hasTarget) {
+      const targetPart = corrText.replace(/⚠️.*?:\n?/, '').replace('🎯', '').trim();
+      corrHtml += `<span class="corr-lang-label">⚠️ Correction</span>`;
+      corrHtml += `<div class="corr-target">🎯 ${escapeHtml(targetPart)}</div>`;
+    } else {
+      // Generic correction
+      corrHtml += `<span class="corr-lang-label">⚠️ Correção / Correction</span>`;
+      corrHtml += `<div class="corr-pt">${escapeHtml(corrText.replace(/⚠️.*?:\n?/, '').trim())}</div>`;
+    }
+
+    corrHtml += '</div>';
+    html += corrHtml;
   }
-  .header h1 {
-    font-family: 'Orbitron', monospace;
-    font-size: 20px;
-    font-weight: 900;
-    color: var(--text-bright);
-    letter-spacing: 2px;
-    text-shadow: 0 0 20px var(--red-glow);
-  
+
+  return html;
+}
+
+// ---------- MARKDOWN PARSER (lightweight) ----------
+function parseMarkdown(text) {
+  return escapeHtml(text)
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    .replace(/`(.*?)`/g, '<code style="background:#334155;padding:0.1em 0.4em;border-radius:4px;font-family:monospace;font-size:0.88em">$1</code>')
+    .replace(/\n/g, '<br>');
+}
+
+// ---------- TYPING INDICATOR ----------
+function showTyping() {
+  const container = document.getElementById('chat-messages');
+  const el = document.createElement('div');
+  el.className = 'message tutor typing-indicator';
+  el.id = 'typing-indicator';
+  const cfg = langConfig[state.targetLanguage];
+  el.innerHTML = `
+    <div class="msg-avatar">${cfg.tutorEmoji}</div>
+    <div class="msg-bubble">
+      <div class="typing-dot"></div>
+      <div class="typing-dot"></div>
+      <div class="typing-dot"></div>
+    </div>`;
+  container.appendChild(el);
+  container.scrollTop = container.scrollHeight;
+}
+
+function removeTyping() {
+  document.getElementById('typing-indicator')?.remove();
+}
+
+// ---------- STATS & TIMER ----------
+function updateStats() {
+  document.getElementById('correction-count').textContent = state.correctionCount;
+  document.getElementById('message-count').textContent    = state.messageCount;
+}
+
+function updateTimer() {
+  const elapsed = Math.floor((Date.now() - state.sessionStart) / 1000);
+  const m = String(Math.floor(elapsed / 60)).padStart(2, '0');
+  const s = String(elapsed % 60).padStart(2, '0');
+  document.getElementById('session-time').textContent = `${m}:${s}`;
+}
+
+// ---------- MINI SETTINGS ----------
+function toggleSettings() {
+  document.getElementById('mini-settings').classList.toggle('hidden');
+}
+
+function updateTopic() {
+  state.topic = document.getElementById('mini-topic').value;
+  document.getElementById('badge-topic').textContent = topicLabels[state.topic];
+}
+
+function updateCorrection() {
+  state.correctionStyle = document.getElementById('mini-correction').value;
+}
+
+function updateCorrLang() {
+  state.correctionLang = document.getElementById('mini-corr-lang').value;
+}
+
+function updateMiniRate(input) {
+  state.speechRate = parseFloat(input.value);
+  document.getElementById('mini-rate-val').textContent = state.speechRate.toFixed(1);
+}
+
+// ---------- CLEAR / EXPORT / HOME ----------
+function clearChat() {
+  if (!confirm('Limpar todo o histórico da conversa?')) return;
+  document.getElementById('chat-messages').innerHTML = '';
+  state.history         = [];
+  state.correctionCount = 0;
+  state.messageCount    = 0;
+  updateStats();
+  showToast('Chat limpo! 🗑️');
+}
+
+function exportChat() {
+  const msgs = document.querySelectorAll('.message');
+  const cfg  = langConfig[state.targetLanguage];
+  let text   = `Language Tutor AI — Sessão de Prática\n`;
+  text += `Idioma: ${cfg.label} | Nível: ${levelLabels[state.level]} | Tópico: ${topicLabels[state.topic]}\n`;
+  text += `Data: ${new Date().toLocaleString('pt-BR')}\n`;
+  text += '─'.repeat(50) + '\n\n';
+
+  msgs.forEach(m => {
+    if (m.classList.contains('typing-indicator')) return;
+    const role   = m.classList.contains('user') ? 'Você' : state.tutorName;
+    const bubble = m.querySelector('.msg-bubble');
+    if (bubble) text += `[${role}]: ${bubble.innerText}\n\n`;
+  });
+
+  const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+  const a    = document.createElement('a');
+  a.href     = URL.createObjectURL(blob);
+  a.download = `sessao-${state.targetLanguage}-${Date.now()}.txt`;
+  a.click();
+  showToast('Conversa exportada! 📥');
+}
+
+function goToSettings() {
+  if (!confirm('Voltar às configurações? A sessão atual será pausada.')) return;
+  clearInterval(state.timerInterval);
+  document.getElementById('chat-panel').classList.remove('active');
+  document.getElementById('settings-panel').classList.add('active');
+  document.getElementById('mini-settings').classList.add('hidden');
+}
+
+// ---------- TOAST ----------
+function showToast(msg, duration = 2800) {
+  const existing = document.querySelector('.toast');
+  if (existing) existing.remove();
+
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.textContent = msg;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), duration);
+}
+
+// ---------- HELPERS ----------
+function escapeHtml(t) {
+  if (typeof t !== 'string') return '';
+  return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function capitalize(s) {
+  return s ? s.charAt(0).toUpperCase() + s.slice(1) : '';
+}
+
+const levelLabels = {
+  beginner: 'Iniciante',
+  intermediate: 'Intermediário',
+  advanced: 'Avançado',
+};
+
+const topicLabels = {
+  free: 'Conversa Livre',
+  travel: 'Viagens',
+  business: 'Negócios',
+  daily: 'Vida Cotidiana',
+  interview: 'Entrevista',
+  movies: 'Filmes & Séries',
+  technology: 'Tecnologia',
+  food: 'Gastronomia',
+  culture: 'Cultura',
+};
+</script>
+
+</body>
+</html>
